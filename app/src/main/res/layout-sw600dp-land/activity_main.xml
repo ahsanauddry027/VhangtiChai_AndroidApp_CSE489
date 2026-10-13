@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Tablet, landscape (designed on a Nexus 10, 1280 x 800 dp).
+    Like the phone in landscape, the change table has two columns of four notes and the keypad is
+    4 columns x 3 rows. There is enough height for the caption to sit under the amount, as in
+    portrait, and the app bar has a subtitle.
+    Sizes come from values-sw600dp-land/sizes.xml.
+-->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layoutDirection="ltr"
+    tools:context=".MainActivity">
+
+    <!-- Header: app bar and amount. Drawn behind the status bar; MainActivity pads it. -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/header"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_header"
+        android:paddingBottom="@dimen/header_padding_bottom"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            style="@style/Widget.VangtiChai.Toolbar"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/toolbar_height"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:subtitle="@string/app_tagline"
+            app:title="@string/app_name" />
+
+        <TextView
+            android:id="@+id/amount_text"
+            style="@style/Widget.VangtiChai.Amount"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/amount_height"
+            android:layout_marginStart="@dimen/amount_side_margin"
+            android:layout_marginEnd="@dimen/amount_side_margin"
+            android:text="@string/label_taka"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar"
+            tools:text="Taka: 688" />
+
+        <TextView
+            android:id="@+id/caption_text"
+            style="@style/Widget.VangtiChai.Caption"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/header_padding_horizontal"
+            android:layout_marginTop="@dimen/caption_margin_top"
+            android:layout_marginEnd="@dimen/header_padding_horizontal"
+            android:text="@string/hint_enter_amount"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/amount_text"
+            tools:text="19 notes" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- The change table ends here and the keypad begins -->
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/split"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="@dimen/notes_width_percent" />
+
+    <!-- Change table: 500, 100, 50, 20 on the left; 10, 5, 2, 1 on the right -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/notes_card"
+        style="@style/Widget.VangtiChai.Card"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="@dimen/screen_margin"
+        android:layout_marginTop="@dimen/section_gap"
+        android:layout_marginBottom="@dimen/screen_margin"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/split"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/header">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="@dimen/notes_card_padding">
+
+            <TextView
+                android:id="@+id/notes_title"
+                style="@style/Widget.VangtiChai.NotesTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/notes_title_margin_horizontal"
+                android:layout_marginTop="@dimen/notes_title_margin_vertical"
+                android:layout_marginEnd="@dimen/notes_title_margin_horizontal"
+                android:text="@string/notes_title"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- Splits the card into two equal columns -->
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/notes_columns"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="@dimen/half" />
+
+            <!-- Left column -->
+            <include
+                android:id="@+id/note_500"
+                layout="@layout/view_note_row"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="@dimen/notes_title_margin_vertical"
+                android:layout_marginEnd="@dimen/note_column_half_gap"
+                app:layout_constraintBottom_toTopOf="@id/note_100"
+                app:layout_constraintEnd_toStartOf="@id/notes_columns"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/notes_title" />
+
+            <include
+                android:id="@+id/note_100"
+                layout="@layout/view_note_row"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="@dimen/note_row_gap"
+                android:layout_marginEnd="@dimen/note_column_half_gap"
+                app:layout_constraintBottom_toTopOf="@id/note_50"
+                app:layout_constraintEnd_toStartOf="@id/notes_columns"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/note_500" />
+
+            <include
+                android:id="@+id/note_50"
+                layout="@layout/view_note_row"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="@dimen/note_row_gap"
+                android:layout_marginEnd="@dimen/note_column_half_gap"
+                app:layout_constraintBottom_toTopOf="@id/note_20"
+                app:layout_constraintEnd_toStartOf="@id/notes_columns"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/note_100" />
+
+            <include
+                android:id="@+id/note_20"
+                layout="@layout/view_note_row"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="@dimen/note_row_gap"
+                android:layout_marginEnd="@dimen/note_column_half_gap"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/notes_columns"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/note_50" />
+
+            <!-- Right column -->
+            <include
+                android:id="@+id/note_10"
+                layout="@layout/view_note_row"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="@dimen/note_column_half_gap"
+                android:layout_marginTop="@dimen/notes_title_margin_vertical"
+                app:layout_constraintBottom_toTopOf="@id/note_5"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/notes_columns"
+                app:layout_constraintTop_toBottomOf="@id/notes_title" />
+
+            <include
+                android:id="@+id/note_5"
+                layout="@layout/view_note_row"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="@dimen/note_column_half_gap"
+                android:layout_marginTop="@dimen/note_row_gap"
+                app:layout_constraintBottom_toTopOf="@id/note_2"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/notes_columns"
+                app:layout_constraintTop_toBottomOf="@id/note_10" />
+
+            <include
+                android:id="@+id/note_2"
+                layout="@layout/view_note_row"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="@dimen/note_column_half_gap"
+                android:layout_marginTop="@dimen/note_row_gap"
+                app:layout_constraintBottom_toTopOf="@id/note_1"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/notes_columns"
+                app:layout_constraintTop_toBottomOf="@id/note_5" />
+
+            <include
+                android:id="@+id/note_1"
+                layout="@layout/view_note_row"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="@dimen/note_column_half_gap"
+                android:layout_marginTop="@dimen/note_row_gap"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/notes_columns"
+                app:layout_constraintTop_toBottomOf="@id/note_2" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!--
+        Keypad, 4 columns:   1 2 3 4
+                             5 6 7 8
+                             9 0 CLEAR
+        Rows 1-2 are horizontal chains; the first column is a vertical chain. 0 lines up with the
+        2nd column and CLEAR spans the 3rd and 4th. The keypad is as tall as the change table.
+    -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/keypad"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="@dimen/column_gap"
+        android:layout_marginEnd="@dimen/screen_margin"
+        app:layout_constraintBottom_toBottomOf="@id/notes_card"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/split"
+        app:layout_constraintTop_toTopOf="@id/notes_card">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/key_1"
+            style="@style/Widget.VangtiChai.Key"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:text="@string/key_1"
+            app:layout_constraintBottom_toTopOf="@id/key_5"
+            app:layout_constraintEnd_toStartOf="@id/key_2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/key_2"
+            style="@style/Widget.VangtiChai.Key"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="@dimen/key_gap"
+            android:text="@string/key_2"
+            app:layout_constraintBottom_toBottomOf="@id/key_1"
+            app:layout_constraintEnd_toStartOf="@id/key_3"
+            app:layout_constraintStart_toEndOf="@id/key_1"
+            app:layout_constraintTop_toTopOf="@id/key_1" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/key_3"
+            style="@style/Widget.VangtiChai.Key"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="@dimen/key_gap"
+            android:text="@string/key_3"
+            app:layout_constraintBottom_toBottomOf="@id/key_1"
+            app:layout_constraintEnd_toStartOf="@id/key_4"
+            app:layout_constraintStart_toEndOf="@id/key_2"
+            app:layout_constraintTop_toTopOf="@id/key_1" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/key_4"
+            style="@style/Widget.VangtiChai.Key"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="@dimen/key_gap"
+            android:text="@string/key_4"
+            app:layout_constraintBottom_toBottomOf="@id/key_1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/key_3"
+            app:layout_constraintTop_toTopOf="@id/key_1" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/key_5"
+            style="@style/Widget.VangtiChai.Key"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="@dimen/key_gap"
+            android:text="@string/key_5"
+            app:layout_constraintBottom_toTopOf="@id/key_9"
+            app:layout_constraintEnd_toStartOf="@id/key_6"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/key_1" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/key_6"
+            style="@style/Widget.VangtiChai.Key"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="@dimen/key_gap"
+            android:text="@string/key_6"
+            app:layout_constraintBottom_toBottomOf="@id/key_5"
+            app:layout_constraintEnd_toStartOf="@id/key_7"
+            app:layout_constraintStart_toEndOf="@id/key_5"
+            app:layout_constraintTop_toTopOf="@id/key_5" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/key_7"
+            style="@style/Widget.VangtiChai.Key"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="@dimen/key_gap"
+            android:text="@string/key_7"
+            app:layout_constraintBottom_toBottomOf="@id/key_5"
+            app:layout_constraintEnd_toStartOf="@id/key_8"
+            app:layout_constraintStart_toEndOf="@id/key_6"
+            app:layout_constraintTop_toTopOf="@id/key_5" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/key_8"
+            style="@style/Widget.VangtiChai.Key"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="@dimen/key_gap"
+            android:text="@string/key_8"
+            app:layout_constraintBottom_toBottomOf="@id/key_5"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/key_7"
+            app:layout_constraintTop_toTopOf="@id/key_5" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/key_9"
+            style="@style/Widget.VangtiChai.Key"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="@dimen/key_gap"
+            android:text="@string/key_9"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/key_5"
+            app:layout_constraintStart_toStartOf="@id/key_5"
+            app:layout_constraintTop_toBottomOf="@id/key_5" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/key_0"
+            style="@style/Widget.VangtiChai.Key"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:text="@string/key_0"
+            app:layout_constraintBottom_toBottomOf="@id/key_9"
+            app:layout_constraintEnd_toEndOf="@id/key_6"
+            app:layout_constraintStart_toStartOf="@id/key_6"
+            app:layout_constraintTop_toTopOf="@id/key_9" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/key_clear"
+            style="@style/Widget.VangtiChai.Key.Clear"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:contentDescription="@string/cd_key_clear"
+            android:text="@string/key_clear"
+            app:layout_constraintBottom_toBottomOf="@id/key_9"
+            app:layout_constraintEnd_toEndOf="@id/key_8"
+            app:layout_constraintStart_toStartOf="@id/key_7"
+            app:layout_constraintTop_toTopOf="@id/key_9" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

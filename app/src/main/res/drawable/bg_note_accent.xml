@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Small colour tab at the start of each change table row; tinted per note in MainActivity. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@android:color/white" />
+    <corners android:radius="@dimen/note_accent_corner_radius" />
+</shape>

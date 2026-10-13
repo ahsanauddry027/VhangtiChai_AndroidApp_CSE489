@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Header -->
+
+    <style name="Widget.VangtiChai.Toolbar" parent="Widget.Material3.Toolbar">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="titleTextAppearance">@style/TextAppearance.VangtiChai.ToolbarTitle</item>
+        <item name="titleTextColor">@color/header_content</item>
+        <item name="subtitleTextAppearance">@style/TextAppearance.VangtiChai.ToolbarSubtitle</item>
+        <item name="subtitleTextColor">@color/header_content_secondary</item>
+        <item name="contentInsetStart">@dimen/header_padding_horizontal</item>
+    </style>
+
+    <style name="TextAppearance.VangtiChai.ToolbarTitle" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:textSize">@dimen/toolbar_title_text</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="TextAppearance.VangtiChai.ToolbarSubtitle" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textSize">@dimen/toolbar_subtitle_text</item>
+    </style>
+
+    <!-- "Taka: 688". Shrinks to fit, so long amounts never get cut off. -->
+    <style name="Widget.VangtiChai.Amount" parent="">
+        <item name="android:textColor">@color/header_content</item>
+        <item name="android:gravity">center</item>
+        <item name="android:maxLines">@integer/single_line</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:fontFeatureSettings">tnum</item>
+        <item name="android:accessibilityLiveRegion">polite</item>
+        <item name="autoSizeTextType">uniform</item>
+        <item name="autoSizeMinTextSize">@dimen/amount_text_min</item>
+        <item name="autoSizeMaxTextSize">@dimen/amount_text_max</item>
+        <item name="autoSizeStepGranularity">@dimen/autosize_step</item>
+    </style>
+
+    <style name="Widget.VangtiChai.Caption" parent="">
+        <item name="android:textColor">@color/header_content_secondary</item>
+        <item name="android:textSize">@dimen/caption_text</item>
+        <item name="android:gravity">center</item>
+        <item name="android:maxLines">@integer/single_line</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <!-- Change table -->
+
+    <style name="Widget.VangtiChai.Card" parent="Widget.Material3.CardView.Outlined">
+        <item name="cardBackgroundColor">@color/card_surface</item>
+        <item name="cardCornerRadius">@dimen/card_corner_radius</item>
+        <item name="cardElevation">@dimen/card_elevation</item>
+        <item name="strokeColor">?attr/colorOutlineVariant</item>
+        <item name="strokeWidth">@dimen/card_stroke_width</item>
+    </style>
+
+    <style name="Widget.VangtiChai.NotesTitle" parent="">
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="android:textSize">@dimen/notes_title_text</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:letterSpacing">@dimen/notes_title_letter_spacing</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:maxLines">@integer/single_line</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="TextAppearance.VangtiChai.NoteLabel" parent="">
+        <item name="android:textSize">@dimen/note_label_text</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontFeatureSettings">tnum</item>
+    </style>
+
+    <style name="Widget.VangtiChai.NoteCount" parent="">
+        <item name="android:gravity">end|center_vertical</item>
+        <item name="android:maxLines">@integer/single_line</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontFeatureSettings">tnum</item>
+        <item name="autoSizeTextType">uniform</item>
+        <item name="autoSizeMinTextSize">@dimen/note_count_text_min</item>
+        <item name="autoSizeMaxTextSize">@dimen/note_count_text_max</item>
+        <item name="autoSizeStepGranularity">@dimen/autosize_step</item>
+    </style>
+
+    <!-- Keypad -->
+
+    <style name="Widget.VangtiChai.Key" parent="Widget.Material3.Button.TonalButton">
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:padding">0dp</item>
+        <item name="android:textSize">@dimen/key_text</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">?attr/colorOnSecondaryContainer</item>
+        <item name="backgroundTint">?attr/colorSecondaryContainer</item>
+        <item name="rippleColor">?attr/colorPrimary</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.VangtiChai.Key</item>
+        <item name="android:stateListAnimator">@animator/key_press</item>
+    </style>
+
+    <style name="Widget.VangtiChai.Key.Clear">
+        <item name="android:textSize">@dimen/key_clear_text</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:letterSpacing">@dimen/key_clear_letter_spacing</item>
+        <item name="android:textColor">?attr/colorOnTertiaryContainer</item>
+        <item name="backgroundTint">?attr/colorTertiaryContainer</item>
+        <item name="rippleColor">?attr/colorTertiary</item>
+    </style>
+
+    <style name="ShapeAppearance.VangtiChai.Key" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/key_corner_radius</item>
+    </style>
+</resources>

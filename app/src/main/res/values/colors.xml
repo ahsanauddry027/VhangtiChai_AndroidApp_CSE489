@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Material 3 colour roles, light theme. The dark theme overrides them in values-night. -->
+    <color name="md_primary">#006C4E</color>
+    <color name="md_on_primary">#FFFFFF</color>
+    <color name="md_primary_container">#87F8C9</color>
+    <color name="md_on_primary_container">#002115</color>
+    <color name="md_secondary">#4C6359</color>
+    <color name="md_on_secondary">#FFFFFF</color>
+    <color name="md_secondary_container">#D3ECDF</color>
+    <color name="md_on_secondary_container">#0A2018</color>
+    <color name="md_tertiary">#A93842</color>
+    <color name="md_on_tertiary">#FFFFFF</color>
+    <color name="md_tertiary_container">#FFDADB</color>
+    <color name="md_on_tertiary_container">#40000D</color>
+    <color name="md_error">#BA1A1A</color>
+    <color name="md_on_error">#FFFFFF</color>
+    <color name="md_error_container">#FFDAD6</color>
+    <color name="md_on_error_container">#410002</color>
+    <color name="md_background">#F3F8F4</color>
+    <color name="md_on_background">#171D1A</color>
+    <color name="md_surface">#F3F8F4</color>
+    <color name="md_on_surface">#171D1A</color>
+    <color name="md_surface_variant">#DBE5DE</color>
+    <color name="md_on_surface_variant">#404944</color>
+    <color name="md_outline">#707974</color>
+    <color name="md_outline_variant">#C9D3CC</color>
+    <color name="md_surface_container_lowest">#FFFFFF</color>
+    <color name="md_surface_container_low">#EDF3EE</color>
+    <color name="md_surface_container">#E7EEE9</color>
+    <color name="md_surface_container_high">#E2E8E3</color>
+    <color name="md_surface_container_highest">#DCE3DE</color>
+    <color name="md_inverse_surface">#2C322E</color>
+    <color name="md_inverse_on_surface">#ECF2ED</color>
+    <color name="md_inverse_primary">#6ADBAD</color>
+
+    <!-- Header gradient and the text drawn on top of it -->
+    <color name="header_gradient_start">#0F9D6C</color>
+    <color name="header_gradient_end">#01543B</color>
+    <color name="header_glow">#33FFFFFF</color>
+    <color name="header_content">#FFFFFF</color>
+    <color name="header_content_secondary">#D9FFFFFF</color>
+
+    <!-- Change table card, and the background of rows whose note is not in the change -->
+    <color name="card_surface">#FFFFFF</color>
+    <color name="note_row_idle">#F0F5F1</color>
+
+    <!-- One colour per Taka note in the change table -->
+    <color name="note_500">#7B3FA0</color>
+    <color name="note_100">#1F63B5</color>
+    <color name="note_50">#C25700</color>
+    <color name="note_20">#00796B</color>
+    <color name="note_10">#C2185B</color>
+    <color name="note_5">#946200</color>
+    <color name="note_2">#4E7D1E</color>
+    <color name="note_1">#5B6B65</color>
+
+    <!-- Launcher icon -->
+    <color name="icon_background_start">#13A874</color>
+    <color name="icon_background_end">#014A34</color>
+    <color name="icon_note">#FFFFFF</color>
+    <color name="icon_note_back">#8CFFFFFF</color>
+    <color name="icon_note_detail">#0B7A55</color>
+    <color name="icon_coin">#F7C548</color>
+    <color name="icon_coin_detail">#C98F12</color>
+</resources>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Sizes for tablets in landscape (designed on a Nexus 10, 1280 x 800 dp).
+    Anything not listed falls back to values-sw600dp/sizes.xml, then values/sizes.xml.
+-->
+<resources>
+    <dimen name="header_padding_bottom">24dp</dimen>
+    <dimen name="amount_height">88dp</dimen>
+    <dimen name="amount_text_max">68sp</dimen>
+    <dimen name="caption_text">18sp</dimen>
+
+    <dimen name="note_label_text">28sp</dimen>
+    <dimen name="note_count_text_max">30sp</dimen>
+
+    <dimen name="key_text">40sp</dimen>
+    <dimen name="key_clear_text">28sp</dimen>
+
+    <item name="notes_width_percent" format="float" type="dimen">0.47</item>
+</resources>

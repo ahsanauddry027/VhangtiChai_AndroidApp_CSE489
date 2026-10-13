@@ -1,0 +1,43 @@
+<resources>
+    <string name="app_name">VangtiChai</string>
+    <string name="app_tagline">Taka change calculator</string>
+
+    <!-- Amount display -->
+    <string name="label_taka">Taka:</string>
+    <string name="hint_enter_amount">Enter an amount</string>
+    <plurals name="caption_max_digits">
+        <item quantity="one">Up to %1$d digit</item>
+        <item quantity="other">Up to %1$d digits</item>
+    </plurals>
+    <plurals name="caption_note_count">
+        <item quantity="one">%1$s note</item>
+        <item quantity="other">%1$s notes</item>
+    </plurals>
+
+    <!-- Change table -->
+    <string name="notes_title">Change</string>
+    <string name="note_label">%1$d:</string>
+    <string name="notes_count_heading">Count</string>
+
+    <!-- Keypad. Digits are the same in every language. -->
+    <string name="key_0" translatable="false">0</string>
+    <string name="key_1" translatable="false">1</string>
+    <string name="key_2" translatable="false">2</string>
+    <string name="key_3" translatable="false">3</string>
+    <string name="key_4" translatable="false">4</string>
+    <string name="key_5" translatable="false">5</string>
+    <string name="key_6" translatable="false">6</string>
+    <string name="key_7" translatable="false">7</string>
+    <string name="key_8" translatable="false">8</string>
+    <string name="key_9" translatable="false">9</string>
+    <string name="key_clear">CLEAR</string>
+
+    <!-- Screen reader descriptions -->
+    <string name="cd_amount_empty">No amount entered</string>
+    <string name="cd_amount">%1$s Taka</string>
+    <plurals name="cd_note_row">
+        <item quantity="one">%2$s note of %1$d Taka</item>
+        <item quantity="other">%2$s notes of %1$d Taka</item>
+    </plurals>
+    <string name="cd_key_clear">Clear the amount</string>
+</resources>

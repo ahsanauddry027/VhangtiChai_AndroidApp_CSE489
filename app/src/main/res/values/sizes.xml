@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Sizes for phones in portrait (designed on a Pixel XL, 411 x 731 dp).
+    The layouts never hardcode sizes. Other screen configurations override the values that differ:
+      values-land/          phones in landscape
+      values-sw600dp/       tablets in portrait (Nexus 10)
+      values-sw600dp-land/  tablets in landscape
+-->
+<resources>
+    <!-- Space around and between the main sections -->
+    <dimen name="screen_margin">16dp</dimen>
+    <dimen name="section_gap">16dp</dimen>
+    <dimen name="column_gap">12dp</dimen>
+
+    <!-- Header: app bar and amount display -->
+    <dimen name="header_corner_radius">28dp</dimen>
+    <dimen name="header_padding_horizontal">20dp</dimen>
+    <dimen name="header_padding_bottom">20dp</dimen>
+    <dimen name="header_glow_size">220dp</dimen>
+    <dimen name="header_glow_offset">-90dp</dimen>
+    <dimen name="header_glow_radius">110dp</dimen>
+    <dimen name="toolbar_height">56dp</dimen>
+    <dimen name="toolbar_title_text">22sp</dimen>
+    <dimen name="toolbar_subtitle_text">14sp</dimen>
+    <dimen name="amount_height">64dp</dimen>
+    <dimen name="amount_text_max">48sp</dimen>
+    <dimen name="amount_text_min">16sp</dimen>
+    <dimen name="amount_side_margin">20dp</dimen>
+    <dimen name="caption_text">14sp</dimen>
+    <dimen name="caption_margin_top">2dp</dimen>
+    <dimen name="shake_distance">10dp</dimen>
+
+    <!-- Change table -->
+    <dimen name="card_corner_radius">24dp</dimen>
+    <dimen name="card_elevation">0dp</dimen>
+    <dimen name="card_stroke_width">1dp</dimen>
+    <dimen name="notes_card_padding">8dp</dimen>
+    <dimen name="notes_title_text">12sp</dimen>
+    <dimen name="notes_title_margin_horizontal">8dp</dimen>
+    <dimen name="notes_title_margin_vertical">8dp</dimen>
+    <dimen name="note_row_gap">4dp</dimen>
+    <dimen name="note_column_half_gap">4dp</dimen>
+    <dimen name="note_row_corner_radius">14dp</dimen>
+    <dimen name="note_row_padding_start">8dp</dimen>
+    <dimen name="note_row_padding_end">10dp</dimen>
+    <dimen name="note_accent_width">4dp</dimen>
+    <dimen name="note_accent_corner_radius">2dp</dimen>
+    <dimen name="note_label_margin_start">6dp</dimen>
+    <dimen name="note_label_text">18sp</dimen>
+    <dimen name="note_count_margin_start">4dp</dimen>
+    <dimen name="note_count_text_max">22sp</dimen>
+    <dimen name="note_count_text_min">9sp</dimen>
+
+    <!-- Tallest the change table (and the keypad beside it) grows on portrait screens -->
+    <dimen name="content_max_height">500dp</dimen>
+
+    <!-- Keypad -->
+    <dimen name="key_gap">10dp</dimen>
+    <dimen name="key_corner_radius">20dp</dimen>
+    <dimen name="key_text">28sp</dimen>
+    <dimen name="key_clear_text">20sp</dimen>
+
+    <!-- Smallest step auto-sized text shrinks by -->
+    <dimen name="autosize_step">1sp</dimen>
+
+    <!-- Proportions, as fractions of the available space -->
+    <item name="half" format="float" type="dimen">0.5</item>
+    <item name="notes_width_percent" format="float" type="dimen">0.36</item>
+    <item name="header_height_percent" format="float" type="dimen">0.32</item>
+    <item name="content_vertical_bias" format="float" type="dimen">0.5</item>
+    <item name="note_accent_height_percent" format="float" type="dimen">0.5</item>
+    <item name="notes_title_letter_spacing" format="float" type="dimen">0.12</item>
+    <item name="key_clear_letter_spacing" format="float" type="dimen">0.08</item>
+</resources>

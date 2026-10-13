@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Sizes for phones in landscape (designed on a Pixel XL, 731 x 411 dp).
+    Height is scarce here, so the caption shares the app bar row and spacing is tighter.
+    Anything not listed falls back to values/sizes.xml.
+-->
+<resources>
+    <dimen name="screen_margin">16dp</dimen>
+    <dimen name="section_gap">12dp</dimen>
+    <dimen name="column_gap">12dp</dimen>
+
+    <dimen name="header_corner_radius">24dp</dimen>
+    <dimen name="header_padding_bottom">8dp</dimen>
+    <dimen name="header_glow_size">180dp</dimen>
+    <dimen name="header_glow_offset">-80dp</dimen>
+    <dimen name="header_glow_radius">90dp</dimen>
+    <dimen name="toolbar_title_text">20sp</dimen>
+    <dimen name="amount_height">44dp</dimen>
+    <dimen name="amount_text_max">36sp</dimen>
+    <dimen name="caption_text">13sp</dimen>
+
+    <dimen name="card_corner_radius">20dp</dimen>
+    <dimen name="notes_card_padding">6dp</dimen>
+    <dimen name="notes_title_margin_vertical">4dp</dimen>
+    <dimen name="note_row_gap">4dp</dimen>
+    <dimen name="note_row_corner_radius">12dp</dimen>
+    <dimen name="note_label_text">18sp</dimen>
+    <dimen name="note_count_text_max">20sp</dimen>
+
+    <dimen name="key_gap">8dp</dimen>
+    <dimen name="key_corner_radius">16dp</dimen>
+    <dimen name="key_text">24sp</dimen>
+    <dimen name="key_clear_text">18sp</dimen>
+
+    <item name="notes_width_percent" format="float" type="dimen">0.42</item>
+</resources>
