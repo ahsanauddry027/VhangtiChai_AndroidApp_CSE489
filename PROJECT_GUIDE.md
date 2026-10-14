@@ -417,7 +417,7 @@ The same qualifiers work for `values/`. For example, `values-land/sizes.xml` ove
 
 **Units:**
 - **px**: real screen pixels. Never use these for layout; phones have very different pixel densities.
-- **dp** (density-independent pixel): about 1/160 of an inch on any screen. On a Pixel XL, 1 dp = 2 px (its density is "xhdpi"). Use dp for sizes, margins and paddings.
+- **dp** (density-independent pixel): about 1/160 of an inch on any screen. A Pixel XL's screen density is 560 dpi, so on it 1 dp = 3.5 px (560 ÷ 160), and its 1440 px wide screen is about 411 dp wide. Use dp for sizes, margins and paddings.
 - **sp** (scale-independent pixel): like dp, but also scales with the user's font-size setting. Use sp for text sizes.
 
 `sizes.xml` uses `dp` for spacing and `sp` for text. Some entries are plain numbers, like `<item name="half" format="float" type="dimen">0.5</item>`. These are proportions, used for percentages and letter spacing.
@@ -971,7 +971,7 @@ Each style is a reusable set of attributes:
 - `ic_launcher_foreground.xml`: two banknotes and a gold coin. Everything sits inside the central **66 dp "safe zone"**, because launchers crop icons into circles, squircles or teardrops.
 - `ic_launcher_monochrome.xml`: a single-colour note. Android 13+ uses it for **themed icons**, recoloured to match the wallpaper.
 
-Android 7.x (API 24 and 25) doesn't support adaptive icons, so it uses the `mipmap-*dpi/ic_launcher.webp` bitmaps instead.
+Android 7.x (API 24 and 25) doesn't support adaptive icons, so it uses the `mipmap-*dpi/ic_launcher.webp` bitmaps instead. Those bitmaps are still the project template's default icon (the green Android robot), so on Android 7.x the launcher shows the robot, not the VangtiChai design.
 
 ### Step 10: The key-press animation (`res/animator/key_press.xml`)
 
@@ -1982,7 +1982,7 @@ dependencies {
 ```
 
 **How a render works:**
-1. Set the device with Robolectric qualifiers. For example, `RuntimeEnvironment.setQualifiers("sw411dp-w411dp-h731dp-port-notnight-xhdpi")` gives a Pixel XL in portrait.
+1. Set the device with Robolectric qualifiers. For example, `RuntimeEnvironment.setQualifiers("sw411dp-w411dp-h731dp-port-notnight-xhdpi")` gives a Pixel XL-sized screen in portrait. The `xhdpi` part renders it at 2 px per dp (a real Pixel XL uses 3.5), which is why the phone screenshots are 822 px wide.
 2. Launch the activity with `Robolectric.buildActivity(MainActivity::class.java).setup()`.
 3. Type by calling `performClick()` on key views, then let time pass with `shadowOf(Looper.getMainLooper()).idleFor(Duration.ofSeconds(2))`.
 4. Dispatch fake system-bar insets, measure and lay out the window's decor view at the device's pixel size, draw it into a `Bitmap`, and save a PNG.
@@ -2037,6 +2037,7 @@ These are honest trade-offs. The current choices fit the assignment, but here is
 - **Spring animations** (`androidx.dynamicanimation`'s `SpringAnimation`) for the pops. They are physics-based and interrupt gracefully.
 - **Accelerating backspace repeat**: start at around 100 ms, speed up to around 40 ms after a second. Or add "hold for 2 s to clear".
 - **SplashScreen API** (`androidx.core:core-splashscreen`) for a branded launch screen on every Android version.
+- **Bitmap launcher icons.** Regenerate the `mipmap-*dpi` bitmaps from the adaptive icon (Android Studio's Image Asset tool can do this), so Android 7.x shows the VangtiChai icon instead of the template's robot.
 - **Material You dynamic colour** (`DynamicColors.applyToActivitiesIfAvailable`) would follow the user's wallpaper. It was deliberately not used, to keep the Taka-green brand.
 
 ### Quality and tooling
