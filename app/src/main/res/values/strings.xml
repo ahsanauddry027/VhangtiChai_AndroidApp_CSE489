@@ -40,4 +40,5 @@
         <item quantity="other">%2$s notes of %1$d Taka</item>
     </plurals>
     <string name="cd_key_clear">Clear the amount</string>
+    <string name="cd_key_backspace">Delete the last digit</string>
 </resources>

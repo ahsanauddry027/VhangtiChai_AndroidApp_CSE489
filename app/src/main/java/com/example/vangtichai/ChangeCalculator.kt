@@ -41,6 +41,9 @@ object ChangeCalculator {
         }
     }
 
+    /** Removes the rightmost digit of the typed [amount] ("234" -> "23"). Nothing typed stays empty. */
+    fun removeLastDigit(amount: String): String = amount.dropLast(1)
+
     /** Numeric value of the typed digits; nothing typed counts as zero. */
     fun valueOf(amount: String): Long = amount.toLongOrNull() ?: 0L
 }

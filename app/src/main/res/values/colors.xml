@@ -40,6 +40,7 @@
     <color name="header_glow">#33FFFFFF</color>
     <color name="header_content">#FFFFFF</color>
     <color name="header_content_secondary">#D9FFFFFF</color>
+    <color name="header_ripple">#3DFFFFFF</color>
 
     <!-- Change table card, and the background of rows whose note is not in the change -->
     <color name="card_surface">#FFFFFF</color>

@@ -33,6 +33,7 @@ A Taka change calculator for Android. Type an amount and see exactly which notes
 | Feature | What it does |
 |---|---|
 | 🔢 **Custom keypad** | A numeric keypad built from scratch with `ConstraintLayout`. Digits are added from the right: tapping 2, 3, 4 shows 2, then 23, then 234. |
+| ⌫ **Backspace** | Works like a phone's: tap it to delete the last digit, or hold it to keep deleting until you let go. It sits beside the amount, as in a phone dialer, and only appears once something is typed. |
 | 💵 **Instant change table** | Shows how many 500, 100, 50, 20, 10, 5, 2 and 1 Taka notes make up the amount, always using the fewest notes. |
 | 🔄 **Survives rotation** | The amount and the change list are saved in `onSaveInstanceState()` and restored when the layout switches between portrait and landscape. |
 | 📱 **Phone and tablet layouts** | Four hand-built layouts for phone and tablet, in portrait and landscape. |
@@ -154,8 +155,8 @@ On Windows, use `gradlew.bat` in place of `./gradlew`.
 
 | Command | What it runs |
 |:--|:--|
-| `./gradlew test` | JVM unit tests for the change logic: the examples from the assignment, the 7-digit limit, and a check that the fewest notes are always used |
-| `./gradlew connectedAndroidTest` | Espresso UI tests for typing, CLEAR, and keeping state across activity recreation (needs a device or emulator) |
+| `./gradlew test` | JVM unit tests for the change logic: the examples from the assignment, the 7-digit limit, backspace, and a check that the fewest notes are always used |
+| `./gradlew connectedAndroidTest` | Espresso UI tests for typing, CLEAR, backspace (tap and hold), and keeping state across activity recreation (needs a device or emulator) |
 
 ## 📂 Project structure
 
@@ -163,7 +164,7 @@ On Windows, use `gradlew.bat` in place of `./gradlew`.
 app/src/
 ├── main/
 │   ├── java/com/example/vangtichai/
-│   │   ├── MainActivity.kt           UI, keypad, animations, state saving
+│   │   ├── MainActivity.kt           UI, keypad, backspace, animations, state saving
 │   │   └── ChangeCalculator.kt       Change calculation logic
 │   └── res/
 │       ├── layout/                   Phone portrait + one change-table row

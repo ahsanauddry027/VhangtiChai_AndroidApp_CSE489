@@ -3,13 +3,18 @@ package com.example.vangtichai
 import androidx.annotation.IdRes
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.longClick
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.hamcrest.Matchers.allOf
+import org.hamcrest.Matchers.anyOf
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.not
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -43,6 +48,36 @@ class MainActivityTest {
         tap(R.id.key_clear)
         assertAmount("Taka:")
         assertCounts("0", "0", "0", "0", "0", "0", "0", "0")
+    }
+
+    @Test
+    fun backspaceRemovesTheLastDigit() {
+        type("688")
+        tap(R.id.key_backspace)
+        assertAmount("Taka: 68")
+        assertCounts("0", "0", "1", "0", "1", "1", "1", "1")
+        tap(R.id.key_backspace)
+        tap(R.id.key_backspace)
+        assertAmount("Taka:")
+        assertCounts("0", "0", "0", "0", "0", "0", "0", "0")
+    }
+
+    @Test
+    fun backspaceShowsOnceSomethingIsTyped() {
+        onView(withId(R.id.key_backspace)).check(matches(not(isDisplayed())))
+        type("5")
+        onView(withId(R.id.key_backspace)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun holdingBackspaceKeepsDeleting() {
+        type("1234567")
+        onView(withId(R.id.key_backspace)).perform(longClick())
+        // A tap deletes one digit; holding keeps deleting, so at least two are gone when it is let go
+        val atLeastTwoDeleted = (0..5).map { kept ->
+            equalTo(if (kept == 0) "Taka:" else "Taka: " + "1234567".take(kept))
+        }
+        onView(withId(R.id.amount_text)).check(matches(withText(anyOf<String>(atLeastTwoDeleted))))
     }
 
     @Test

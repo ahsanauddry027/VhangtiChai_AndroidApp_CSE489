@@ -21,6 +21,10 @@
     <dimen name="amount_height">112dp</dimen>
     <dimen name="amount_text_max">88sp</dimen>
     <dimen name="amount_text_min">24sp</dimen>
+    <dimen name="amount_side_margin">96dp</dimen>
+    <dimen name="backspace_size">72dp</dimen>
+    <dimen name="backspace_icon_size">44dp</dimen>
+    <dimen name="backspace_margin_end">18dp</dimen>
     <dimen name="caption_text">20sp</dimen>
     <dimen name="caption_margin_top">4dp</dimen>
     <dimen name="shake_distance">16dp</dimen>

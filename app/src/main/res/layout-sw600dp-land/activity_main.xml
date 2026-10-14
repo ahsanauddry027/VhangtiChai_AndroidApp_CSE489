@@ -50,6 +50,21 @@
             app:layout_constraintTop_toBottomOf="@id/toolbar"
             tools:text="Taka: 688" />
 
+        <!-- Backspace: deletes the last digit, and keeps deleting while held. Hidden until
+             something is typed. -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/key_backspace"
+            style="@style/Widget.VangtiChai.Backspace"
+            android:layout_width="@dimen/backspace_size"
+            android:layout_height="@dimen/backspace_size"
+            android:layout_marginEnd="@dimen/backspace_margin_end"
+            android:contentDescription="@string/cd_key_backspace"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="@id/amount_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/amount_text"
+            tools:visibility="visible" />
+
         <TextView
             android:id="@+id/caption_text"
             style="@style/Widget.VangtiChai.Caption"

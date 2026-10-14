@@ -25,8 +25,15 @@
     <dimen name="amount_height">64dp</dimen>
     <dimen name="amount_text_max">48sp</dimen>
     <dimen name="amount_text_min">16sp</dimen>
-    <dimen name="amount_side_margin">20dp</dimen>
+    <!-- Room on both sides of the amount: enough for the backspace key on the right, and the
+         same on the left so the amount stays centred -->
+    <dimen name="amount_side_margin">60dp</dimen>
     <dimen name="caption_text">14sp</dimen>
+    <!-- Backspace key at the end of the amount row. The margin lines the icon up with the
+         app bar title's padding: header_padding_horizontal - (size - icon size) / 2. -->
+    <dimen name="backspace_size">48dp</dimen>
+    <dimen name="backspace_icon_size">28dp</dimen>
+    <dimen name="backspace_margin_end">10dp</dimen>
     <dimen name="caption_margin_top">2dp</dimen>
     <dimen name="shake_distance">10dp</dimen>
 

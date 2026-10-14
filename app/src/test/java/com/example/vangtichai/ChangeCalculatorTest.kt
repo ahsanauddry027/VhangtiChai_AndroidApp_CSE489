@@ -82,6 +82,14 @@ class ChangeCalculatorTest {
     }
 
     @Test
+    fun backspaceRemovesTheRightmostDigit() {
+        assertEquals("23", ChangeCalculator.removeLastDigit("234"))
+        assertEquals("2", ChangeCalculator.removeLastDigit("23"))
+        assertEquals("", ChangeCalculator.removeLastDigit("2"))
+        assertEquals("", ChangeCalculator.removeLastDigit(""))
+    }
+
+    @Test
     fun valueOfTypedDigits() {
         assertEquals(0L, ChangeCalculator.valueOf(""))
         assertEquals(688L, ChangeCalculator.valueOf("688"))

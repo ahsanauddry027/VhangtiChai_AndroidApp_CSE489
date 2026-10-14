@@ -14,6 +14,10 @@ What the app does
 - The change table lists how many of each note make up the amount, using as few notes as
   possible (500: 1, 100: 1, 50: 1, ... for 688).
 - CLEAR resets the amount and the table.
+- A backspace key at the end of the amount row deletes the last digit, like the one beside the
+  number in a phone dialer: tap it to remove one digit, or hold it to keep removing digits until
+  it is let go. It only shows once something is typed. It sits in the header, so the keypad keeps
+  exactly the configuration from the assignment (10 digits and CLEAR).
 - Rotating the device keeps the amount and the change list. Both are saved in
   onSaveInstanceState() and restored in onCreate(); the activity is recreated so that the
   landscape (or portrait) layout is loaded.
@@ -84,9 +88,10 @@ Tests
                                             the four examples from the assignment
                                             screenshots and a check that the fewest notes
                                             are always used. Run: gradlew test
-  app/src/androidTest/.../MainActivityTest.kt  Espresso tests for typing, CLEAR and keeping
-                                            state across recreation. Run on a device or
-                                            emulator: gradlew connectedAndroidTest
+  app/src/androidTest/.../MainActivityTest.kt  Espresso tests for typing, CLEAR, backspace
+                                            (tap and hold) and keeping state across
+                                            recreation. Run on a device or emulator:
+                                            gradlew connectedAndroidTest
 
 
 Project structure

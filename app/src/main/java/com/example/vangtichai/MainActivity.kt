@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.HapticFeedbackConstants
 import android.view.KeyEvent
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
@@ -22,6 +23,8 @@ import androidx.core.text.color
 import androidx.core.text.scale
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import com.example.vangtichai.databinding.ActivityMainBinding
@@ -69,6 +72,17 @@ class MainActivity : AppCompatActivity() {
 
     private val restoreCaption = Runnable { binding.captionText.text = caption() }
 
+    /** While the backspace key is held, deletes a digit every [BACKSPACE_REPEAT_INTERVAL] ms. */
+    private val repeatBackspace = object : Runnable {
+        override fun run() {
+            if (amount.isEmpty()) return
+            val key = binding.keyBackspace
+            key.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+            onBackspace()
+            key.postDelayed(this, BACKSPACE_REPEAT_INTERVAL)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         // Draw behind the system bars. The header under the status bar is dark green in both
         // light and dark theme, so the status bar icons are always light.
@@ -95,6 +109,23 @@ class MainActivity : AppCompatActivity() {
             onClear()
         }
 
+        // Backspace works like a phone's: a tap deletes one digit, holding it keeps deleting.
+        binding.keyBackspace.setOnClickListener {
+            it.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+            onBackspace()
+        }
+        binding.keyBackspace.setOnLongClickListener {
+            it.removeCallbacks(repeatBackspace)
+            repeatBackspace.run()
+            true
+        }
+        binding.keyBackspace.setOnTouchListener { key, event ->
+            if (event.actionMasked == MotionEvent.ACTION_UP || event.actionMasked == MotionEvent.ACTION_CANCEL) {
+                key.removeCallbacks(repeatBackspace)
+            }
+            false // The button still handles the touch itself: press state, click and long click
+        }
+
         // After a rotation, put back the amount and change list that were on screen.
         if (savedInstanceState != null) {
             amount = savedInstanceState.getString(KEY_AMOUNT).orEmpty()
@@ -116,10 +147,7 @@ class MainActivity : AppCompatActivity() {
             in KeyEvent.KEYCODE_0..KeyEvent.KEYCODE_9 -> digitKeys[keyCode - KeyEvent.KEYCODE_0]
             in KeyEvent.KEYCODE_NUMPAD_0..KeyEvent.KEYCODE_NUMPAD_9 -> digitKeys[keyCode - KeyEvent.KEYCODE_NUMPAD_0]
             KeyEvent.KEYCODE_ESCAPE, KeyEvent.KEYCODE_CLEAR, KeyEvent.KEYCODE_C -> binding.keyClear
-            KeyEvent.KEYCODE_DEL -> {
-                onBackspace()
-                return true
-            }
+            KeyEvent.KEYCODE_DEL -> binding.keyBackspace
             else -> return super.onKeyDown(keyCode, event)
         }
         key.flashPressed()
@@ -139,7 +167,7 @@ class MainActivity : AppCompatActivity() {
     private fun onClear() = setAmount("")
 
     private fun onBackspace() {
-        if (amount.isNotEmpty()) setAmount(amount.dropLast(1))
+        if (amount.isNotEmpty()) setAmount(ChangeCalculator.removeLastDigit(amount))
     }
 
     private fun setAmount(newAmount: String) {
@@ -183,7 +211,28 @@ class MainActivity : AppCompatActivity() {
         binding.captionText.text = caption()
 
         change.forEachIndexed { i, count -> renderRow(i, count, animate) }
+        renderBackspace(animate)
         if (animate) binding.amountText.pop(AMOUNT_POP_SCALE)
+    }
+
+    /** Like in a phone dialer, the backspace key only shows while there is a digit to delete. */
+    private fun renderBackspace(animate: Boolean) {
+        val key = binding.keyBackspace
+        val show = amount.isNotEmpty()
+        val alpha = if (show) 1f else 0f
+        if (key.isVisible == show && key.alpha == alpha) return
+        key.animate().cancel()
+        if (!animate) {
+            key.alpha = alpha
+            key.isInvisible = !show
+            return
+        }
+        key.isInvisible = false
+        key.animate()
+            .alpha(alpha)
+            .setDuration(BACKSPACE_FADE_DURATION)
+            .withEndAction { key.isInvisible = !show }
+            .start()
     }
 
     private fun renderRow(index: Int, count: Long, animate: Boolean) {
@@ -315,5 +364,7 @@ class MainActivity : AppCompatActivity() {
         const val SHAKE_DURATION = 400L
         const val CAPTION_RESTORE_DELAY = 1600L
         const val KEY_FLASH_DURATION = 90L
+        const val BACKSPACE_REPEAT_INTERVAL = 70L
+        const val BACKSPACE_FADE_DURATION = 150L
     }
 }
