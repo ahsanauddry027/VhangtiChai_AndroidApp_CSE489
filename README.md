@@ -137,8 +137,8 @@ Each size was rendered in portrait and landscape, in both themes, after typing a
 ## 🚀 Getting started
 
 ```bash
-git clone https://github.com/ahsanauddry027/VhangtiChai_AndroidApp.git
-cd VhangtiChai_AndroidApp
+git clone https://github.com/ahsanauddry027/VhangtiChai_AndroidApp_CSE489.git
+cd VhangtiChai_AndroidApp_CSE489
 ```
 
 Open the folder in **Android Studio**, wait for the Gradle sync to finish, then run the `app` configuration on an emulator or a device with Android 7.0 (API 24) or newer.
