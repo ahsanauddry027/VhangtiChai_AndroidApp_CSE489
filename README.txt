@@ -21,8 +21,9 @@ What the app does
 - Rotating the device keeps the amount and the change list. Both are saved in
   onSaveInstanceState() and restored in onCreate(); the activity is recreated so that the
   landscape (or portrait) layout is loaded.
-- Amounts of up to 7 digits (9,999,999 Taka) are accepted. Typing more shakes the amount and
-  shows "Up to 7 digits", so every count always fits on screen in full.
+- Amounts of up to 9 digits (999,999,999 Taka) are accepted. Typing more shakes the amount and
+  shows "Up to 9 digits". Long amounts and counts shrink to fit, so everything stays on one
+  screen in full.
 
 Extras
 - Material 3 design with a green "Taka" theme and full dark theme support.
@@ -69,7 +70,7 @@ Devices and screen types tested
 -------------------------------
 Each configuration below was checked by rendering the running app at that screen size and
 orientation (Robolectric with native graphics) after typing amounts such as 6, 68, 688, 6880
-and 9999999, in both the light and dark theme:
+and 999999999, in both the light and dark theme:
 
   Pixel XL (required)          411 x 731 dp    portrait and landscape
   Nexus 10 (required)          800 x 1280 dp   portrait and landscape

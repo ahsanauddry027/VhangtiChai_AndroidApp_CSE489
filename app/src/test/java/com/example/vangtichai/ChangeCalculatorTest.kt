@@ -23,7 +23,7 @@ class ChangeCalculatorTest {
 
     @Test
     fun largestAcceptedAmount() {
-        assertArrayEquals(longArrayOf(19_999, 4, 1, 2, 0, 1, 2, 0), ChangeCalculator.breakdown(9_999_999))
+        assertArrayEquals(longArrayOf(1_999_999, 4, 1, 2, 0, 1, 2, 0), ChangeCalculator.breakdown(999_999_999))
     }
 
     @Test

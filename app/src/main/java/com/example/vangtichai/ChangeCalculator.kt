@@ -9,10 +9,10 @@ object ChangeCalculator {
     val NOTES = intArrayOf(500, 100, 50, 20, 10, 5, 2, 1)
 
     /**
-     * Longest amount (in digits) the keypad accepts: up to 9,999,999 Taka. That keeps the largest
-     * count (19,999 five-hundreds) narrow enough to show in full even on small phones.
+     * Longest amount (in digits) the keypad accepts: up to 999,999,999 Taka. The largest count
+     * (1,999,999 five-hundreds) still shows in full on small phones; the text shrinks to fit.
      */
-    const val MAX_DIGITS = 7
+    const val MAX_DIGITS = 9
 
     /**
      * Returns how many of each note in [NOTES] make up [amount], using as few notes as possible.

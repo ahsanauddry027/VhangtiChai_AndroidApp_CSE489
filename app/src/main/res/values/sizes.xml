@@ -72,7 +72,7 @@
 
     <!-- Proportions, as fractions of the available space -->
     <item name="half" format="float" type="dimen">0.5</item>
-    <item name="notes_width_percent" format="float" type="dimen">0.36</item>
+    <item name="notes_width_percent" format="float" type="dimen">0.4</item>
     <item name="header_height_percent" format="float" type="dimen">0.32</item>
     <item name="content_vertical_bias" format="float" type="dimen">0.5</item>
     <item name="note_accent_height_percent" format="float" type="dimen">0.5</item>

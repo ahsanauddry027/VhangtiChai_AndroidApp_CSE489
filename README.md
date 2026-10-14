@@ -40,7 +40,7 @@ A Taka change calculator for Android. Type an amount and see exactly which notes
 | 🎨 **Material 3, light and dark** | A green "Taka" theme with full dark-theme support and edge-to-edge drawing that keeps clear of the status bar, navigation bar and display cutouts. |
 | 🌈 **Colour-coded notes** | Each note has its own colour. Notes that are part of the change light up and the rest fade back. |
 | ✨ **Small touches** | Counts pop when they change, keys shrink slightly when pressed, and every key press gives haptic feedback. |
-| 🛑 **Input limit** | Accepts up to 7 digits (9,999,999 Taka). Typing more shakes the amount and shows *"Up to 7 digits"*, so every count fits on screen. |
+| 🛑 **Input limit** | Accepts up to 9 digits (999,999,999 Taka). Typing more shakes the amount and shows *"Up to 9 digits"*. Long amounts and counts shrink to fit, so everything stays on one screen. |
 | ⌨️ **Hardware keyboard** | Digits type, <kbd>Backspace</kbd> deletes the last digit, and <kbd>Esc</kbd> or <kbd>C</kbd> clears. Handy on an emulator. |
 | ♿ **Accessible** | Screen readers announce the amount as it changes, and each row has a spoken description such as *"1 note of 500 Taka"*. |
 | 🖼️ **Adaptive launcher icon** | A custom adaptive icon, including a themed (monochrome) version for Android 13+. |
@@ -95,7 +95,7 @@ Tablet layouts use the same arrangement, scaled up, with a subtitle in the app b
 ### Input limit and launcher icon
 
 <p align="center">
-  <img src="docs/images/phone-limit-light.png" width="230" alt="The amount at the 7-digit limit, with the caption 'Up to 7 digits'">
+  <img src="docs/images/phone-limit-light.png" width="230" alt="The amount at the 9-digit limit, with the caption 'Up to 9 digits'">
   &nbsp;&nbsp;
   <img src="docs/images/launcher-icons.png" width="500" alt="Launcher icon: round, squircle and themed monochrome versions">
 </p>
@@ -115,7 +115,7 @@ The layout files contain no hardcoded values. Text sizes, margins, paddings, cor
 
 ### Tested screen sizes
 
-Each size was rendered in portrait and landscape, in both themes, after typing amounts such as 6, 68, 688, 6880 and 9999999.
+Each size was rendered in portrait and landscape, in both themes, after typing amounts such as 6, 68, 688, 6880 and 999999999.
 
 | Device | Size | |
 |:--|:--|:--|
@@ -155,7 +155,7 @@ On Windows, use `gradlew.bat` in place of `./gradlew`.
 
 | Command | What it runs |
 |:--|:--|
-| `./gradlew test` | JVM unit tests for the change logic: the examples from the assignment, the 7-digit limit, backspace, and a check that the fewest notes are always used |
+| `./gradlew test` | JVM unit tests for the change logic: the examples from the assignment, the 9-digit limit, backspace, and a check that the fewest notes are always used |
 | `./gradlew connectedAndroidTest` | Espresso UI tests for typing, CLEAR, backspace (tap and hold), and keeping state across activity recreation (needs a device or emulator) |
 
 ## 📂 Project structure
