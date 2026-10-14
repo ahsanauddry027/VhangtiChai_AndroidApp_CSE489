@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Base.Theme.VangtiChai" parent="Theme.Material3.DayNight.NoActionBar">
+    <!-- Always dark, whatever the system setting, so there is no light theme to switch to -->
+    <style name="Base.Theme.VangtiChai" parent="Theme.Material3.Dark.NoActionBar">
         <item name="colorPrimary">@color/md_primary</item>
         <item name="colorOnPrimary">@color/md_on_primary</item>
         <item name="colorPrimaryContainer">@color/md_primary_container</item>

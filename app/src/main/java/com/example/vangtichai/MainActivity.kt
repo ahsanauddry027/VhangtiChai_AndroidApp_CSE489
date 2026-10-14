@@ -11,6 +11,7 @@ import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.DecelerateInterpolator
 import android.view.animation.OvershootInterpolator
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
@@ -57,6 +58,15 @@ class MainActivity : AppCompatActivity() {
 
     private val noteColors by lazy { NOTE_COLORS.map { ContextCompat.getColor(this, it) } }
     private val idleRowColor by lazy { ContextCompat.getColor(this, R.color.note_row_idle) }
+
+    /**
+     * Lit row backgrounds: each note's colour, faintly, over the card. They are kept opaque so that a
+     * fade between idle and lit goes straight from one to the other, never through a brighter colour.
+     */
+    private val litRowColors by lazy {
+        val card = ContextCompat.getColor(this, R.color.card_surface)
+        noteColors.map { ColorUtils.compositeColors(ColorUtils.setAlphaComponent(it, ACTIVE_ROW_ALPHA), card) }
+    }
     private val labelColor by lazy { ContextCompat.getColor(this, R.color.header_content_secondary) }
     private val strongTextColor by lazy {
         MaterialColors.getColor(binding.root, com.google.android.material.R.attr.colorOnSurface)
@@ -66,9 +76,9 @@ class MainActivity : AppCompatActivity() {
         ColorUtils.setAlphaComponent(color, MUTED_TEXT_ALPHA)
     }
 
-    /** Row background colours currently on screen, and the animations moving between them. */
-    private val rowTints = IntArray(ChangeCalculator.NOTES.size)
-    private val rowTintAnimators = arrayOfNulls<ValueAnimator>(ChangeCalculator.NOTES.size)
+    /** How lit up each row is on screen (0 = faded back, 1 = lit up), and the animations moving it. */
+    private val rowLevels = FloatArray(ChangeCalculator.NOTES.size)
+    private val rowAnimators = arrayOfNulls<ValueAnimator>(ChangeCalculator.NOTES.size)
 
     private val restoreCaption = Runnable { binding.captionText.text = caption() }
 
@@ -84,9 +94,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Draw behind the system bars. The header under the status bar is dark green in both
-        // light and dark theme, so the status bar icons are always light.
-        enableEdgeToEdge(statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT))
+        // Draw behind the system bars. The app is always dark, so both bars keep light icons even
+        // when the rest of the phone uses a light theme.
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
+            navigationBarStyle = SystemBarStyle.dark(Color.TRANSPARENT),
+        )
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -133,6 +146,7 @@ class MainActivity : AppCompatActivity() {
                 ?: ChangeCalculator.breakdown(ChangeCalculator.valueOf(amount))
         }
         render(animate = false)
+        if (savedInstanceState == null) playEntrance()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -245,14 +259,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         // Notes that are part of the change light up in their own colour; the rest fade back.
-        val noteColor = noteColors[index]
-        val inChange = count > 0
-        row.noteLabel.setTextColor(if (inChange) noteColor else mutedTextColor)
-        row.noteCount.setTextColor(if (inChange) strongTextColor else mutedTextColor)
-        row.noteAccent.backgroundTintList = ColorStateList.valueOf(
-            if (inChange) noteColor else ColorUtils.setAlphaComponent(noteColor, IDLE_ACCENT_ALPHA)
-        )
-        tintRow(index, if (inChange) ColorUtils.setAlphaComponent(noteColor, ACTIVE_ROW_ALPHA) else idleRowColor, animate)
+        lightRow(index, if (count > 0) 1f else 0f, animate)
         if (animate && changed) row.noteCount.pop(COUNT_POP_SCALE, pivotAtEnd = true)
     }
 
@@ -262,24 +269,33 @@ class MainActivity : AppCompatActivity() {
         return resources.getQuantityString(R.plurals.caption_note_count, notes.toInt(), notes.toString())
     }
 
-    private fun tintRow(index: Int, target: Int, animate: Boolean) {
-        rowTintAnimators[index]?.cancel()
-        rowTintAnimators[index] = null
-        val shown = rowTints[index]
+    /** Moves a row towards [target] (0 = faded back, 1 = lit up), smoothly when [animate] is set. */
+    private fun lightRow(index: Int, target: Float, animate: Boolean) {
+        rowAnimators[index]?.cancel()
+        rowAnimators[index] = null
+        val shown = rowLevels[index]
         if (!animate || shown == target) {
-            setRowTint(index, target)
+            setRowLevel(index, target)
             return
         }
-        rowTintAnimators[index] = ValueAnimator.ofArgb(shown, target).apply {
-            duration = ROW_TINT_DURATION
-            addUpdateListener { setRowTint(index, it.animatedValue as Int) }
+        rowAnimators[index] = ValueAnimator.ofFloat(shown, target).apply {
+            duration = ROW_FADE_DURATION
+            addUpdateListener { setRowLevel(index, it.animatedValue as Float) }
             start()
         }
     }
 
-    private fun setRowTint(index: Int, color: Int) {
-        rowTints[index] = color
-        noteRows[index].root.backgroundTintList = ColorStateList.valueOf(color)
+    /** Colours a row for its [level]: the background, colour tab, note and count all blend together. */
+    private fun setRowLevel(index: Int, level: Float) {
+        rowLevels[index] = level
+        val row = noteRows[index]
+        val noteColor = noteColors[index]
+        row.noteLabel.setTextColor(ColorUtils.blendARGB(mutedTextColor, noteColor, level))
+        row.noteCount.setTextColor(ColorUtils.blendARGB(mutedTextColor, strongTextColor, level))
+        row.noteAccent.backgroundTintList = ColorStateList.valueOf(
+            ColorUtils.blendARGB(ColorUtils.setAlphaComponent(noteColor, IDLE_ACCENT_ALPHA), noteColor, level)
+        )
+        row.root.backgroundTintList = ColorStateList.valueOf(ColorUtils.blendARGB(idleRowColor, litRowColors[index], level))
     }
 
     /**
@@ -315,6 +331,22 @@ class MainActivity : AppCompatActivity() {
                 marginEnd = keypadEnd + bars.right
             }
             WindowInsetsCompat.CONSUMED
+        }
+    }
+
+    /** On a fresh start the change table, then the keypad, rise gently into place. */
+    private fun playEntrance() {
+        val rise = resources.getDimension(R.dimen.entrance_rise)
+        listOf(binding.notesCard, binding.keypad).forEachIndexed { i, section ->
+            section.alpha = 0f
+            section.translationY = rise
+            section.animate()
+                .alpha(1f)
+                .translationY(0f)
+                .setStartDelay(ENTRANCE_DELAY + i * ENTRANCE_STAGGER)
+                .setDuration(ENTRANCE_DURATION)
+                .setInterpolator(DecelerateInterpolator(ENTRANCE_DECELERATION))
+                .start()
         }
     }
 
@@ -360,11 +392,15 @@ class MainActivity : AppCompatActivity() {
         const val COUNT_POP_SCALE = 1.35f
         const val POP_DURATION = 280L
         const val OVERSHOOT_TENSION = 3f
-        const val ROW_TINT_DURATION = 220L
+        const val ROW_FADE_DURATION = 220L
         const val SHAKE_DURATION = 400L
         const val CAPTION_RESTORE_DELAY = 1600L
         const val KEY_FLASH_DURATION = 90L
         const val BACKSPACE_REPEAT_INTERVAL = 70L
         const val BACKSPACE_FADE_DURATION = 150L
+        const val ENTRANCE_DELAY = 60L
+        const val ENTRANCE_STAGGER = 70L
+        const val ENTRANCE_DURATION = 380L
+        const val ENTRANCE_DECELERATION = 2f
     }
 }

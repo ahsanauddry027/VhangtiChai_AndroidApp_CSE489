@@ -1,60 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Material 3 colour roles, light theme. The dark theme overrides them in values-night. -->
-    <color name="md_primary">#006C4E</color>
-    <color name="md_on_primary">#FFFFFF</color>
-    <color name="md_primary_container">#87F8C9</color>
-    <color name="md_on_primary_container">#002115</color>
-    <color name="md_secondary">#4C6359</color>
-    <color name="md_on_secondary">#FFFFFF</color>
-    <color name="md_secondary_container">#D3ECDF</color>
-    <color name="md_on_secondary_container">#0A2018</color>
-    <color name="md_tertiary">#A93842</color>
-    <color name="md_on_tertiary">#FFFFFF</color>
-    <color name="md_tertiary_container">#FFDADB</color>
-    <color name="md_on_tertiary_container">#40000D</color>
-    <color name="md_error">#BA1A1A</color>
-    <color name="md_on_error">#FFFFFF</color>
-    <color name="md_error_container">#FFDAD6</color>
-    <color name="md_on_error_container">#410002</color>
-    <color name="md_background">#F3F8F4</color>
-    <color name="md_on_background">#171D1A</color>
-    <color name="md_surface">#F3F8F4</color>
-    <color name="md_on_surface">#171D1A</color>
-    <color name="md_surface_variant">#DBE5DE</color>
-    <color name="md_on_surface_variant">#404944</color>
-    <color name="md_outline">#707974</color>
-    <color name="md_outline_variant">#C9D3CC</color>
-    <color name="md_surface_container_lowest">#FFFFFF</color>
-    <color name="md_surface_container_low">#EDF3EE</color>
-    <color name="md_surface_container">#E7EEE9</color>
-    <color name="md_surface_container_high">#E2E8E3</color>
-    <color name="md_surface_container_highest">#DCE3DE</color>
-    <color name="md_inverse_surface">#2C322E</color>
-    <color name="md_inverse_on_surface">#ECF2ED</color>
-    <color name="md_inverse_primary">#6ADBAD</color>
+    <!-- Material 3 colour roles. The app always uses this dark theme, whatever the system setting. -->
+    <color name="md_primary">#6ADBAD</color>
+    <color name="md_on_primary">#003827</color>
+    <color name="md_primary_container">#005139</color>
+    <color name="md_on_primary_container">#87F8C9</color>
+    <color name="md_secondary">#B3CCBF</color>
+    <color name="md_on_secondary">#1E352B</color>
+    <color name="md_secondary_container">#2A3B34</color>
+    <color name="md_on_secondary_container">#D3ECDF</color>
+    <color name="md_tertiary">#FFB3B6</color>
+    <color name="md_on_tertiary">#680019</color>
+    <color name="md_tertiary_container">#5C1A24</color>
+    <color name="md_on_tertiary_container">#FFDADB</color>
+    <color name="md_error">#FFB4AB</color>
+    <color name="md_on_error">#690005</color>
+    <color name="md_error_container">#93000A</color>
+    <color name="md_on_error_container">#FFDAD6</color>
+    <color name="md_background">#0E1411</color>
+    <color name="md_on_background">#DEE4DF</color>
+    <color name="md_surface">#0E1411</color>
+    <color name="md_on_surface">#DEE4DF</color>
+    <color name="md_surface_variant">#404944</color>
+    <color name="md_on_surface_variant">#BFC9C2</color>
+    <color name="md_outline">#8A938D</color>
+    <color name="md_outline_variant">#2E3833</color>
+    <color name="md_surface_container_lowest">#090E0C</color>
+    <color name="md_surface_container_low">#161D19</color>
+    <color name="md_surface_container">#1B221E</color>
+    <color name="md_surface_container_high">#252C28</color>
+    <color name="md_surface_container_highest">#303733</color>
+    <color name="md_inverse_surface">#DEE4DF</color>
+    <color name="md_inverse_on_surface">#2C322E</color>
+    <color name="md_inverse_primary">#006C4E</color>
 
     <!-- Header gradient and the text drawn on top of it -->
-    <color name="header_gradient_start">#0F9D6C</color>
-    <color name="header_gradient_end">#01543B</color>
-    <color name="header_glow">#33FFFFFF</color>
+    <color name="header_gradient_start">#0B6E4D</color>
+    <color name="header_gradient_end">#06301F</color>
+    <color name="header_glow">#1FFFFFFF</color>
     <color name="header_content">#FFFFFF</color>
     <color name="header_content_secondary">#D9FFFFFF</color>
     <color name="header_ripple">#3DFFFFFF</color>
 
     <!-- Change table card, and the background of rows whose note is not in the change -->
-    <color name="card_surface">#FFFFFF</color>
-    <color name="note_row_idle">#F0F5F1</color>
+    <color name="card_surface">#151C18</color>
+    <color name="note_row_idle">#1C2420</color>
 
-    <!-- One colour per Taka note in the change table -->
-    <color name="note_500">#7B3FA0</color>
-    <color name="note_100">#1F63B5</color>
-    <color name="note_50">#C25700</color>
-    <color name="note_20">#00796B</color>
-    <color name="note_10">#C2185B</color>
-    <color name="note_5">#946200</color>
-    <color name="note_2">#4E7D1E</color>
-    <color name="note_1">#5B6B65</color>
+    <!-- One colour per Taka note in the change table, light enough to read on dark surfaces -->
+    <color name="note_500">#D4A9F2</color>
+    <color name="note_100">#9DC4FF</color>
+    <color name="note_50">#FFB77C</color>
+    <color name="note_20">#6FD9C7</color>
+    <color name="note_10">#FF8DB7</color>
+    <color name="note_5">#F2C150</color>
+    <color name="note_2">#A6D77A</color>
+    <color name="note_1">#B5C3BD</color>
 
     <!-- Launcher icon -->
     <color name="icon_background_start">#13A874</color>

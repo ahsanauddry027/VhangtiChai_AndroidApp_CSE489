@@ -18,11 +18,11 @@ A Taka change calculator for Android. Type an amount and see exactly which notes
 
 <br>
 
-<img src="docs/images/phone-688-light.png" width="250" alt="VangtiChai showing 688 Taka in the light theme">
+<img src="docs/images/phone-688.png" width="250" alt="VangtiChai showing 688 Taka, made of one of each note">
 &nbsp;&nbsp;
-<img src="docs/images/phone-688-dark.png" width="250" alt="VangtiChai showing 688 Taka in the dark theme">
+<img src="docs/images/phone-6880.png" width="250" alt="VangtiChai showing 6880 Taka, made of 19 notes">
 &nbsp;&nbsp;
-<img src="docs/images/phone-68-light.png" width="250" alt="VangtiChai showing 68 Taka, with unused notes faded out">
+<img src="docs/images/phone-68.png" width="250" alt="VangtiChai showing 68 Taka, with unused notes faded out">
 
 </div>
 
@@ -37,9 +37,9 @@ A Taka change calculator for Android. Type an amount and see exactly which notes
 | 💵 **Instant change table** | Shows how many 500, 100, 50, 20, 10, 5, 2 and 1 Taka notes make up the amount, always using the fewest notes. |
 | 🔄 **Survives rotation** | The amount and the change list are saved in `onSaveInstanceState()` and restored when the layout switches between portrait and landscape. |
 | 📱 **Phone and tablet layouts** | Four hand-built layouts for phone and tablet, in portrait and landscape. |
-| 🎨 **Material 3, light and dark** | A green "Taka" theme with full dark-theme support and edge-to-edge drawing that keeps clear of the status bar, navigation bar and display cutouts. |
+| 🌙 **Dark Material 3 design** | A dark green "Taka" theme that is always on, whatever the phone's own theme setting, with edge-to-edge drawing that keeps clear of the status bar, navigation bar and display cutouts. |
 | 🌈 **Colour-coded notes** | Each note has its own colour. Notes that are part of the change light up and the rest fade back. |
-| ✨ **Small touches** | Counts pop when they change, keys shrink slightly when pressed, and every key press gives haptic feedback. |
+| ✨ **Smooth motion** | The change table and keypad rise into place when the app opens. Rows fade smoothly between lit and faded, counts pop when they change, keys shrink slightly when pressed, and every key press gives haptic feedback. |
 | 🛑 **Input limit** | Accepts up to 9 digits (999,999,999 Taka). Typing more shakes the amount and shows *"Up to 9 digits"*. Long amounts and counts shrink to fit, so everything stays on one screen. |
 | ⌨️ **Hardware keyboard** | Digits type, <kbd>Backspace</kbd> deletes the last digit, and <kbd>Esc</kbd> or <kbd>C</kbd> clears. Handy on an emulator. |
 | ♿ **Accessible** | Screen readers announce the amount as it changes, and each row has a spoken description such as *"1 note of 500 Taka"*. |
@@ -77,9 +77,9 @@ It takes the largest note that fits, then repeats with what is left. The Taka no
 The change table splits into two columns and the keypad grows to four columns.
 
 <p align="center">
-  <img src="docs/images/phone-land-688-light.png" width="400" alt="Phone in landscape, light theme, 688 Taka">
+  <img src="docs/images/phone-land-688.png" width="400" alt="Phone in landscape, 688 Taka">
   &nbsp;
-  <img src="docs/images/phone-land-6880-dark.png" width="400" alt="Phone in landscape, dark theme, 6880 Taka">
+  <img src="docs/images/phone-land-6880.png" width="400" alt="Phone in landscape, 6880 Taka">
 </p>
 
 ### Tablet
@@ -87,15 +87,15 @@ The change table splits into two columns and the keypad grows to four columns.
 Tablet layouts use the same arrangement, scaled up, with a subtitle in the app bar.
 
 <p align="center">
-  <img src="docs/images/tablet-688-light.png" width="280" alt="Tablet in portrait, light theme">
+  <img src="docs/images/tablet-688.png" width="280" alt="Tablet in portrait, 688 Taka">
   &nbsp;
-  <img src="docs/images/tablet-land-688-dark.png" width="460" alt="Tablet in landscape, dark theme">
+  <img src="docs/images/tablet-land-688.png" width="460" alt="Tablet in landscape, 688 Taka">
 </p>
 
 ### Input limit and launcher icon
 
 <p align="center">
-  <img src="docs/images/phone-limit-light.png" width="230" alt="The amount at the 9-digit limit, with the caption 'Up to 9 digits'">
+  <img src="docs/images/phone-limit.png" width="230" alt="The amount at the 9-digit limit, with the caption 'Up to 9 digits'">
   &nbsp;&nbsp;
   <img src="docs/images/launcher-icons.png" width="500" alt="Launcher icon: round, squircle and themed monochrome versions">
 </p>
@@ -111,11 +111,11 @@ All four layouts are built on `ConstraintLayout` using chains, guidelines and pe
 | `layout-sw600dp/activity_main.xml` | Tablet, portrait | Nexus 10 · 800 × 1280 dp |
 | `layout-sw600dp-land/activity_main.xml` | Tablet, landscape | Nexus 10 · 1280 × 800 dp |
 
-The layout files contain no hardcoded values. Text sizes, margins, paddings, corner radii and proportions come from a `sizes.xml` for each configuration, all text is in `strings.xml`, and colours are in `colors.xml` (light) and `values-night/colors.xml` (dark).
+The layout files contain no hardcoded values. Text sizes, margins, paddings, corner radii and proportions come from a `sizes.xml` for each configuration, all text is in `strings.xml`, and all colours are in `colors.xml`.
 
 ### Tested screen sizes
 
-Each size was rendered in portrait and landscape, in both themes, after typing amounts such as 6, 68, 688, 6880 and 999999999.
+Each size was rendered in portrait and landscape after typing amounts such as 6, 68, 688, 6880 and 999999999.
 
 | Device | Size | |
 |:--|:--|:--|

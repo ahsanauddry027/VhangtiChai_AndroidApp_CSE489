@@ -28,6 +28,7 @@
     <dimen name="caption_text">20sp</dimen>
     <dimen name="caption_margin_top">4dp</dimen>
     <dimen name="shake_distance">16dp</dimen>
+    <dimen name="entrance_rise">40dp</dimen>
 
     <dimen name="card_corner_radius">32dp</dimen>
     <dimen name="notes_card_padding">14dp</dimen>

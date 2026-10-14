@@ -26,9 +26,11 @@ What the app does
   screen in full.
 
 Extras
-- Material 3 design with a green "Taka" theme and full dark theme support.
-- Notes that are part of the change light up in their own colour; counts pop when they
-  change; keys shrink slightly when pressed; haptic feedback on key presses.
+- Material 3 design with a dark green "Taka" theme. The app is always dark, whatever the
+  phone's own theme setting, so there is no theme switching.
+- Smooth motion: the change table and keypad rise into place when the app opens; notes that
+  are part of the change fade up in their own colour and the rest fade back; counts pop when
+  they change; keys shrink slightly when pressed; haptic feedback on key presses.
 - Edge-to-edge drawing that keeps content clear of the status bar, navigation bar and
   display cutouts.
 - Hardware keyboard support (handy on an emulator): digits type, Backspace deletes the last
@@ -62,15 +64,14 @@ layout proportions are defined in sizes.xml for each configuration:
   res/values-sw600dp/sizes.xml       tablets, portrait
   res/values-sw600dp-land/sizes.xml  tablets, landscape
 
-All text is in res/values/strings.xml and all colours in res/values/colors.xml (light) and
-res/values-night/colors.xml (dark).
+All text is in res/values/strings.xml and all colours in res/values/colors.xml.
 
 
 Devices and screen types tested
 -------------------------------
 Each configuration below was checked by rendering the running app at that screen size and
 orientation (Robolectric with native graphics) after typing amounts such as 6, 68, 688, 6880
-and 999999999, in both the light and dark theme:
+and 999999999:
 
   Pixel XL (required)          411 x 731 dp    portrait and landscape
   Nexus 10 (required)          800 x 1280 dp   portrait and landscape

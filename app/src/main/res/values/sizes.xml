@@ -36,6 +36,8 @@
     <dimen name="backspace_margin_end">10dp</dimen>
     <dimen name="caption_margin_top">2dp</dimen>
     <dimen name="shake_distance">10dp</dimen>
+    <!-- How far the change table and keypad rise into place when the app starts -->
+    <dimen name="entrance_rise">24dp</dimen>
 
     <!-- Change table -->
     <dimen name="card_corner_radius">24dp</dimen>
