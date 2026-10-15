@@ -1,6 +1,6 @@
 # VangtiChai: The Complete Project Guide
 
-*Describes the project as of commit `48ad475` (2026-10-14).*
+*Describes the project as of 2026-10-15.*
 
 > **What this file is.** A from-scratch, step-by-step explanation of the VangtiChai Android app: what every file does, what every line of code means, why each decision was made, and what could be done differently. It assumes **no prior Android or Kotlin knowledge**.
 >
@@ -42,9 +42,9 @@
 | Main layout | `ConstraintLayout` everywhere (the assignment focuses on it) |
 | Architecture | One `Activity` (`MainActivity`) plus one pure-logic `object` (`ChangeCalculator`). No ViewModel, no fragments, no database. |
 | Package / applicationId | `com.example.vangtichai` |
-| minSdk / targetSdk / compileSdk | 24 / 37 / 37 |
+| minSdk / targetSdk / compileSdk | 21 / 37 / 37 (21 is the minimum the assignment suggests) |
 | Build | Gradle 9.6.0 wrapper, Android Gradle Plugin (AGP) 9.4.1, Kotlin DSL (`*.gradle.kts`), version catalog `gradle/libs.versions.toml`. AGP 9 compiles Kotlin itself, so there is no separate Kotlin plugin. |
-| Dependencies | `core-ktx`, `appcompat`, `activity-ktx`, `constraintlayout`, `material`. Tests: `junit`, `androidx.test.ext:junit`, `espresso-core`. |
+| Dependencies | `core-ktx`, `appcompat`, `activity-ktx`, `constraintlayout`, `material`. Tests: `junit`, `androidx.test.ext:junit`, `espresso-core`. The versions are the newest that still support minSdk 21 (see rule 9). |
 | View access | View Binding (`buildFeatures { viewBinding = true }`) |
 | Theme | **Always dark.** `Theme.Material3.Dark.NoActionBar`. There is no `values-night` folder and no light theme. |
 | Repository | `https://github.com/ahsanauddry027/VhangtiChai_AndroidApp_CSE489` (branch `main`) |
@@ -68,7 +68,8 @@ app/src/main/res/
     values/themes.xml      App theme (Material3 Dark) and colour roles
     values/integers.xml    Small integer constants used by XML (max lines, key press duration)
     animator/key_press.xml Keys shrink to 93% while pressed
-    drawable/              Header background, row/tab shapes, backspace icon, launcher icon layers
+    drawable/              Header background (plain), row/tab shapes, backspace icon, launcher icon layers
+    drawable-v23/          Header background with its two glows, used from API 23 on
 app/src/test/.../ChangeCalculatorTest.kt       JVM unit tests (11 tests)
 app/src/androidTest/.../MainActivityTest.kt    Espresso UI tests (7 tests, need device/emulator)
 README.txt   Required by the assignment: describes the app and lists tested devices
@@ -86,9 +87,14 @@ README.md    GitHub landing page with screenshots (images in docs/images/)
    Do **not** add keys to the grid. The backspace key lives in the header for this reason.
 4. **Digits are added from the right** (typing 2, 3, 4 shows 2, 23, 234). The amount is stored as a `String` of digits.
 5. **Rotation must keep the amount and the change list.** This is done with `onSaveInstanceState()` / `onCreate(savedInstanceState)`. **Do not** add `android:configChanges` to the manifest. The activity must be recreated so Android loads the landscape or portrait layout.
-6. **Must work on Pixel XL (411x731 dp) and Nexus 10 (800x1280 dp), both orientations.** It was also checked on Nexus 5 (360x640), a Pixel 7-sized phone (411x914), Nexus 7 (600x960) and Pixel C (900x1280).
+6. **Must work on Pixel XL (411x731 dp) and Nexus 10 (800x1280 dp), both orientations.** It is tested on Pixel XL and Nexus 10 emulators, on the Nexus 5 (360x640), Pixel 7-sized phone (411x914), Nexus 7 (600x960) and Pixel C (900x1280) screen sizes emulated on them, and on an Android 5.0 (API 21) emulator.
 7. `README.txt` is a required deliverable. It must list the other devices and screen types tested. Keep it updated when behaviour changes.
 8. The root layout sets `android:layoutDirection="ltr"`, so "start" always means left and "end" always means right, even in right-to-left languages.
+9. **The minimum SDK is 21 (Android 5.0), as the assignment suggests.** To keep it working:
+   - Don't upgrade `core-ktx`, `appcompat`, `activity-ktx` or `material` past the versions in `libs.versions.toml`. Their newer releases require API 23, and the build then fails at the manifest merge.
+   - Don't colour shape (`GradientDrawable`) backgrounds with `backgroundTint`. Android 5.0 ignores it and the shape stays white. `MainActivity` colours the change table's rows with `GradientDrawable.setColor()` instead.
+   - Layer-list items only support `width`, `height` and `gravity` from API 23. That is why the header with glows is in `drawable-v23/`, and `drawable/bg_header.xml` is a plain gradient for API 21 and 22.
+   - Any framework call newer than API 21 needs an `if (Build.VERSION.SDK_INT >= ...)` check. `./gradlew lintDebug` reports missing ones (`NewApi`).
 
 ### Behaviour summary
 
@@ -156,11 +162,13 @@ It then lists the requirements, which are mapped to the implementation below. It
 | 1 | In the top part of the screen, the entered amount next to a "Taka:" label. | The header shows "Taka: 688" (the label and number are one styled text). | `amount_text` in every layout |
 | 2 | Each tap adds the digit to the right of the amount (2, 3, 4 shows 2, then 23, then 234). | `ChangeCalculator.appendDigit()` appends to a `String`. | `ChangeCalculator.kt` |
 | 3 | On rotation, keep the entered amount and change list, and show a "slightly altered layout". | `onSaveInstanceState()` saves both, and `onCreate()` restores them. The landscape layouts have a 2-column table and a 4-column keypad. | `MainActivity.kt`, `layout-land/`, `layout-sw600dp-land/` |
-| 4 | Layouts work gracefully on phones and tablets. Test on at least Pixel XL and Nexus 10. | Four layouts chosen by resource qualifiers (`-land`, `-sw600dp`). Checked on six screen sizes in both orientations. | Part 5 |
+| 4 | Layouts work gracefully on phones and tablets. Test with the emulator on at least a Pixel XL and a Nexus 10. | Four layouts chosen by resource qualifiers (`-land`, `-sw600dp`). Tested on Pixel XL and Nexus 10 emulators in both orientations, plus four more screen sizes and Android 5.0. | Part 5 |
 | Hint | "4 different layouts" are enough for full credit. | Exactly four `activity_main.xml` variants. | `res/layout*/` |
-| Hint | List the other devices and screen types you tested in `README.txt`. | `README.txt` lists six devices with their dp sizes. | `README.txt` |
+| Hint | List the other devices and screen types you tested in `README.txt`. | `README.txt` lists the two required devices, four more screen sizes (in px, dpi and dp) and Android 5.0. | `README.txt` |
 | Hint | Do not hardcode values in layout XML. Put sizes in `sizes.xml` and reference them. | Every size is a `@dimen` from one of the four `sizes.xml` files. Text is in `strings.xml` and colours in `colors.xml`. | `res/values*/sizes.xml` |
-| Hint | Use any language, but Kotlin is encouraged. Min API 21 or lower is acceptable. | Kotlin. Min SDK 24 (Android 7.0), which is higher than 21. This is fine because 21 is a suggestion ("or lower if need be"), and 24 is the template default. | `app/build.gradle.kts` |
+| Hint | Kotlin, Java or Flutter, and a minimum API level of 21 ("or lower if need be"). | Kotlin, and min SDK 21 (Android 5.0). The libraries are pinned to their last releases that support API 21, and the app was run on an Android 5.0 emulator. | `app/build.gradle.kts`, `gradle/libs.versions.toml` |
+
+**Every requirement is met.** Each one was checked on the final build with the Android Emulator: on the Pixel XL and the Nexus 10 that the brief names, in portrait and landscape, and on Android 5.0, the minimum version (Part 5.2).
 
 ### Extras beyond the brief
 
@@ -225,7 +233,7 @@ CSE489_App_VhangtiChai/                 the project root
 ├── gradlew, gradlew.bat                run Gradle: ./gradlew (macOS/Linux), gradlew.bat (Windows)
 ├── local.properties                    path to your Android SDK (machine-specific, NOT committed)
 ├── README.txt / README.md              documentation
-├── docs/images/                        screenshots used by README.md
+├── docs/images/                        screenshots used by README.md and the guide's PDF
 └── app/                                the one and only module: the app itself
     ├── build.gradle.kts                app build settings: SDK levels, dependencies, view binding
     └── src/
@@ -250,11 +258,11 @@ Gradle files written in Kotlin end in `.gradle.kts` (Kotlin DSL). They are Kotli
 - `dependencyResolutionManagement { repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS); repositories { google(); mavenCentral() } }`: where to download *libraries*. The FAIL mode forbids modules from declaring their own repositories, so there is one source of truth.
 - `rootProject.name = "VangtiChai"` and `include(":app")`: the project name and its single module.
 
-**`gradle/libs.versions.toml`** is the **version catalog**. Instead of writing `"androidx.core:core-ktx:1.19.1"` in every build file, you name it once:
+**`gradle/libs.versions.toml`** is the **version catalog**. Instead of writing `"androidx.core:core-ktx:1.17.0"` in every build file, you name it once:
 
 ```toml
 [versions]
-coreKtx = "1.19.1"                       # a version number, referenced below
+coreKtx = "1.17.0"                       # a version number, referenced below
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -286,7 +294,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.vangtichai" // the app's unique ID on a device / the Play Store
-        minSdk = 24                              // oldest Android version that can install it (7.0)
+        minSdk = 21                              // oldest Android version that can install it (5.0)
         targetSdk = 37                           // the version whose behaviour the app is tested against
         versionCode = 1                          // integer version, must increase for each release
         versionName = "1.0"                      // human-readable version
@@ -339,16 +347,20 @@ dependencies {
 
 | Setting | Meaning | Value |
 |:--|:--|:--|
-| `minSdk` | Phones older than this cannot install the app. | 24 (Android 7.0, 2016) |
+| `minSdk` | Phones older than this cannot install the app. | 21 (Android 5.0 Lollipop, 2014), the minimum the assignment suggests |
 | `targetSdk` | Tells Android "I've been tested with this version's behaviour changes". | 37 |
 | `compileSdk` | Which Android API you *compile* against, so you can use its newest functions. | 37 |
 
-Because `minSdk` is 24, code that uses newer APIs must check the version at runtime. VangtiChai does this once:
+Because `minSdk` is 21, code that uses newer APIs must check the version at runtime. VangtiChai does this once:
 
 ```kotlin
 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) HapticFeedbackConstants.REJECT   // API 30+
 else HapticFeedbackConstants.LONG_PRESS                                             // older phones
 ```
+
+Resources can depend on the Android version too. A folder with a `-vNN` qualifier is only used from API NN on. The header's two soft glows are sized and placed with layer-list features that need API 23, so `drawable-v23/bg_header.xml` has them, and Android 5.0 and 5.1 use the plain gradient in `drawable/bg_header.xml`.
+
+Libraries have a minimum SDK as well. The newest releases of `core-ktx`, `appcompat`, `activity-ktx` and `material` need API 23, so the version catalog pins the last releases that support API 21.
 
 ### 2.6 The manifest
 
@@ -771,7 +783,7 @@ Follow these steps in order. Each step says **what** to create, **why**, and exp
    - **Name:** `VangtiChai`
    - **Package name:** `com.example.vangtichai`
    - **Language:** Kotlin
-   - **Minimum SDK:** API 24 ("Android 7.0 (Nougat)")
+   - **Minimum SDK:** API 21 ("Android 5.0 (Lollipop)"), the level the assignment suggests
    - **Build configuration language:** Kotlin DSL (`build.gradle.kts`)
 4. Click **Finish** and wait for the **Gradle sync** (the progress bar at the bottom) to finish.
 
@@ -785,18 +797,20 @@ The template gives you:
 
 You will replace most of these. Delete the example tests, and any `values-night/themes.xml` the template created, because this app is dark-only.
 
-5. Create two emulators: **Tools, then Device Manager, then Create Virtual Device**. Pick the **Pixel XL** hardware profile, then the **Nexus 10** (under "Tablet"). Any recent system image works. These are the two devices the assignment requires.
+5. Create two emulators: **Tools, then Device Manager, then Create Virtual Device**. Pick the **Pixel XL** hardware profile, then the **Nexus 10** (under "Tablet"). Any recent system image works. These are the two devices the assignment requires. To check the minimum version too, make a third with the Pixel XL profile and an **API 21** system image.
 
 ### Step 2: Configure Gradle
 
-1. In `gradle/libs.versions.toml`, make sure these libraries exist. Add `activity-ktx` and `material` if the template didn't:
+1. In `gradle/libs.versions.toml`, make sure these libraries exist. Add `activity-ktx` and `material` if the template didn't, and set `coreKtx` and `appcompat` to the versions below:
 
 ```toml
 [versions]
-activityKtx = "1.13.0"
-material = "1.14.0"
+coreKtx = "1.17.0"
+appcompat = "1.7.1"
+activityKtx = "1.11.0"
+material = "1.13.0"
 constraintlayout = "2.2.2"
-# (plus the template's agp, coreKtx, appcompat, junit, junitVersion, espressoCore)
+# (plus the template's agp, junit, junitVersion, espressoCore)
 
 [libraries]
 androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "activityKtx" }
@@ -806,6 +820,8 @@ androidx-constraintlayout = { group = "androidx.constraintlayout", name = "const
 
 2. In `app/build.gradle.kts`, add `buildFeatures { viewBinding = true }` inside `android { }`, and the `implementation(...)` lines shown in Part 2.4.
 3. Click **Sync Now**.
+
+*Why these versions?* They are the newest releases that still support API 21. The next releases of all four need API 23, and with `minSdk = 21` the build would stop with an error like "minSdkVersion 21 cannot be smaller than version 23 declared in library". Android Studio will suggest the newer versions anyway. Don't take them.
 
 *Why these libraries?*
 - `material` provides `MaterialButton`, `MaterialCardView`, `MaterialToolbar` and the Material 3 themes.
@@ -953,11 +969,13 @@ Each style is a reusable set of attributes:
 
 ### Step 9: Drawables
 
-**`drawable/bg_header.xml`**: a `layer-list` (several shapes stacked):
+**`drawable-v23/bg_header.xml`**: a `layer-list` (several shapes stacked):
 1. A rectangle with a **linear gradient** at `angle="315"` (from top-left to bottom-right), from `header_gradient_start` to `header_gradient_end`, with rounded *bottom* corners only.
-2. Two **radial-gradient ovals** (soft glows) at the top-left and top-right corners. Negative offsets (`header_glow_offset` = -90 dp) push them partly off-screen so only a soft edge shows.
+2. Two **radial-gradient ovals** (soft glows) at the top-left and top-right corners. Each is `header_glow_size` across (the items' `android:width` and `android:height`) and pinned to its corner with `android:gravity`. Negative offsets (`header_glow_offset` = -90 dp) push them partly off-screen so only a soft edge shows.
 
-**`drawable/bg_note_row.xml`** and **`bg_note_accent.xml`**: plain white rounded rectangles. *Why white?* Code **tints** them (`backgroundTintList`) with each note's colour. One drawable serves all 8 rows and every colour.
+Layer-list items only support `width`, `height` and `gravity` from API 23 on. On Android 5.0 the glows ignored them and spread into a pale blob across the middle of the header. So this file is in **`drawable-v23/`**, which Android only uses from API 23 on, and **`drawable/bg_header.xml`** is the fallback for Android 5.0 and 5.1: just the gradient rectangle, without glows.
+
+**`drawable/bg_note_row.xml`** and **`bg_note_accent.xml`**: plain rounded rectangles. Their white fill is only a placeholder. Code gives each row its colour with `GradientDrawable.setColor()` (16.10), so one drawable file serves all 8 rows and every colour.
 
 **`drawable/ic_backspace.xml`**: a **vector drawable**, an image described by drawing commands, so it is sharp at any size. The `pathData` is Google's Material "backspace" (outlined) icon:
 - `M`/`L`/`H`/`V` = move to, line to, horizontal line, vertical line
@@ -971,7 +989,7 @@ Each style is a reusable set of attributes:
 - `ic_launcher_foreground.xml`: two banknotes and a gold coin. Everything sits inside the central **66 dp "safe zone"**, because launchers crop icons into circles, squircles or teardrops.
 - `ic_launcher_monochrome.xml`: a single-colour note. Android 13+ uses it for **themed icons**, recoloured to match the wallpaper.
 
-Android 7.x (API 24 and 25) doesn't support adaptive icons, so it uses the `mipmap-*dpi/ic_launcher.webp` bitmaps instead. Those bitmaps are still the project template's default icon (the green Android robot), so on Android 7.x the launcher shows the robot, not the VangtiChai design.
+Android 5.0 to 7.1 (API 21 to 25) don't support adaptive icons, so they use the `mipmap-*dpi/ic_launcher.webp` bitmaps instead. Those bitmaps are still the project template's default icon (the green Android robot), so on those versions the launcher shows the robot, not the VangtiChai design.
 
 ### Step 10: The key-press animation (`res/animator/key_press.xml`)
 
@@ -1085,7 +1103,7 @@ Create a new layout file. It is one row: a colour tab, the note label ("500:"), 
 <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/bg_note_row"          <!-- white rounded rect, tinted from code -->
+    android:background="@drawable/bg_note_row"          <!-- rounded rect, coloured from code -->
     android:importantForAccessibility="yes"              <!-- TalkBack reads the ROW as one item -->
     android:paddingStart="@dimen/note_row_padding_start"
     android:paddingEnd="@dimen/note_row_padding_end">
@@ -1317,6 +1335,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding             // all views of activity_main.xml
     private lateinit var noteRows: List<ViewNoteRowBinding>       // the 8 rows, in NOTES order
+    private lateinit var rowShapes: List<GradientDrawable>        // each row's background shape
+    private lateinit var accentShapes: List<GradientDrawable>     // each row's colour tab shape
     private lateinit var digitKeys: List<MaterialButton>          // digitKeys[3] is the "3" key
 
     private var amount = ""
@@ -1400,9 +1420,13 @@ Android picks which `activity_main.xml` to inflate (portrait, landscape or table
     noteRows.forEachIndexed { i, row ->
         row.noteLabel.text = getString(R.string.note_label, ChangeCalculator.NOTES[i])   // "500:", "100:"...
     }
+    rowShapes = noteRows.map { it.root.background.mutate() as GradientDrawable }        // coloured in 16.10
+    accentShapes = noteRows.map { it.noteAccent.background.mutate() as GradientDrawable }
 ```
 
 The 8 included rows are collected **in the same order as `ChangeCalculator.NOTES`**, so `noteRows[i]` always shows `change[i]`. Each label is filled from code, so the row layout stays generic.
+
+The last two lines keep each row's two shapes, its background and its colour tab, so 16.10 can colour them. All eight rows are inflated from the same drawable files, and Android shares one copy of a drawable's state between everything that uses it, so recolouring one row would recolour all of them. **`mutate()`** gives each row its own copy first.
 
 ```kotlin
     digitKeys = with(binding) { listOf(key0, key1, key2, key3, key4, key5, key6, key7, key8, key9) }
@@ -1658,16 +1682,16 @@ private fun setRowLevel(index: Int, level: Float) {
     val noteColor = noteColors[index]
     row.noteLabel.setTextColor(ColorUtils.blendARGB(mutedTextColor, noteColor, level))
     row.noteCount.setTextColor(ColorUtils.blendARGB(mutedTextColor, strongTextColor, level))
-    row.noteAccent.backgroundTintList = ColorStateList.valueOf(
+    accentShapes[index].setColor(
         ColorUtils.blendARGB(ColorUtils.setAlphaComponent(noteColor, IDLE_ACCENT_ALPHA), noteColor, level)
     )
-    row.root.backgroundTintList = ColorStateList.valueOf(ColorUtils.blendARGB(idleRowColor, litRowColors[index], level))
+    rowShapes[index].setColor(ColorUtils.blendARGB(idleRowColor, litRowColors[index], level))
 }
 ```
 
 `ColorUtils.blendARGB(a, b, t)` mixes colour `a` and colour `b`: `t = 0` gives all `a`, `t = 1` all `b`, and `0.5` half and half. All four parts of the row (label, count, colour tab, background) use the **same level**, so they fade together.
 
-`backgroundTintList` recolours the white `bg_note_row` and `bg_note_accent` shapes. That's why those drawables are white.
+`GradientDrawable.setColor()` replaces the fill of the row's `bg_note_row` and `bg_note_accent` shapes, which are white in the XML. A background *tint* (`backgroundTintList`) looks the same on newer Android, and an earlier version of this code used one. But Android 5.0 (API 21) can't tint shape drawables. On the Android 5.0 emulator every row stayed white, with the light text on top almost invisible. `setColor()` works on every version.
 
 > **Why `litRowColors` is pre-blended (opaque).** The lit background is the note colour at 16% opacity over the card. If you blend an *opaque* idle colour toward a *16%-transparent* colour, the halfway point is a half-transparent, half-strength colour. Over the dark card it actually looks **brighter** than both ends, so you'd see a flash mid-fade. Pre-blending the lit colour onto the card colour (`compositeColors`) makes both ends opaque. The fade then moves steadily from one to the other, and the final colour on screen is exactly the same as before. This was measured: the on-screen brightness goes 0.016, 0.024, 0.035 (idle, halfway, lit).
 
@@ -1883,7 +1907,8 @@ The 7 tests:
 3. **Rotate.** Use the emulator's rotate buttons (or Ctrl+Left/Right on Windows and Linux). The two-column landscape layout appears, still showing 688.
 4. Try the **backspace** (tap and hold), **CLEAR**, typing a 10th digit (it shakes), and your computer's keyboard (digits, Backspace, Esc).
 5. Repeat on the **Nexus 10** emulator, in both orientations.
-6. Optional: turn on **TalkBack** (Settings, then Accessibility) to hear the content descriptions.
+6. Repeat steps 2 to 4 on the **API 21** Pixel XL emulator, to check the oldest Android version the app supports.
+7. Optional: turn on **TalkBack** (Settings, then Accessibility) to hear the content descriptions.
 
 ### Step 19: README.txt, Git and GitHub
 
@@ -1891,7 +1916,7 @@ The 7 tests:
 - what the app does
 - the four layouts and their target devices
 - where the sizes live
-- the **list of tested devices and screen sizes** (Pixel XL, Nexus 10, Nexus 5, a Pixel 7-sized phone, Nexus 7, Pixel C)
+- the **list of tested devices and screen sizes**: the Pixel XL and Nexus 10 emulators, the Nexus 5, Pixel 7-sized phone, Nexus 7 and Pixel C screen sizes emulated on them, and Android 5.0
 - how to run the tests
 
 **Git basics used in this project:**
@@ -1939,6 +1964,8 @@ git push -u origin main                    # upload; -u remembers origin/main fo
 | 23 | **Edge-to-edge with an insets listener that adds to the original paddings** | Modern Android draws behind bars (and Android 15+ requires it for apps targeting it). The header colour fills the status bar area. Adding to the original values avoids paddings growing on every insets callback. | Not edge-to-edge: a dated look, and enforced by newer targets anyway. |
 | 24 | **Accessibility** (live region, row descriptions, plurals, child views hidden from TalkBack) | Screen-reader users hear "688 Taka" and "1 note of 500 Taka", not raw symbols. | Nothing: the app would be confusing with TalkBack. |
 | 25 | **`README.txt` *and* `README.md`** | The `.txt` is the required deliverable. The `.md` is GitHub's landing page with screenshots. | Only one: either fails the brief or looks bare on GitHub. |
+| 26 | **Minimum SDK 21, with libraries pinned to their last API 21 releases** | The brief names API 21 ("or lower if need be"), and a grader's emulator may run an old Android. The pinned versions have every feature the app uses. | `minSdk` 24 (the template default) with the newest libraries: the app can't be installed below Android 7.0. |
+| 27 | **Rows coloured with `GradientDrawable.setColor()`** | Works on every Android version. A background tint can't colour shapes on Android 5.0, where the rows stayed white. | `backgroundTintList`, used before: breaks on API 21. `DrawableCompat.wrap()` plus a tint also works there, but needs more code. |
 
 ---
 
@@ -1947,11 +1974,55 @@ git push -u origin main                    # upload; -u remembers origin/main fo
 ### 5.1 Unit tests and Espresso tests
 
 - `./gradlew test`: **11 unit tests**, all passing.
-- `./gradlew connectedAndroidTest`: **7 Espresso tests**. These need an emulator or device.
+- `./gradlew connectedAndroidTest`: **7 Espresso tests**. These need an emulator or device. All 7 pass on the Pixel XL and Nexus 10 emulators (Android 17, API 37) and on the Android 5.0 (API 21) Pixel XL emulator.
 
-### 5.2 The Robolectric "render harness" (how the screenshots and checks were made)
+> **Android 5.0 and Gradle's test runner.** On the API 21 emulator the tests pass, and the JUnit report says so, but `connectedAndroidTest` then never finishes: Gradle's test platform keeps waiting after the run. Running the tests directly avoids that. Install both APKs (`./gradlew installDebug installDebugAndroidTest`), then run `adb shell am instrument -w com.example.vangtichai.test/androidx.test.runner.AndroidJUnitRunner`. It prints `OK (7 tests)`.
 
-No emulator was available while the app was being developed and checked, so a **copy of the project in a scratch folder** was given extra test tooling. This harness is *not* in the repository. Recreating it is a recommended improvement (Part 6).
+### 5.2 Emulator testing: the required devices, more screen sizes and Android 5.0
+
+The assignment says to test with the emulator on at least a Pixel XL and a Nexus 10. Three emulators (AVDs) were used:
+
+| AVD | Screen | System image |
+|:--|:--|:--|
+| Pixel XL | 1440 × 2560 px at 560 dpi = 411 × 731 dp | Android 17 (API 37), Google Play |
+| Nexus 10 | 2560 × 1600 px at 320 dpi = 1280 × 800 dp | Android 17 (API 37), Google Play |
+| Pixel XL | the same | Android 5.0 (API 21), the oldest version the app supports |
+
+**How each device was checked.** A small script drove the emulator through `adb`, so every step used the real app:
+1. Install the debug APK and launch `MainActivity`.
+2. Tap the on-screen keys. `adb shell uiautomator dump` lists every view with its id and bounds, and `adb shell input tap x y` taps the middle of a key. So this is real touch input, not the hardware-keyboard path.
+3. Read the screen back from the same dump: the amount text, the caption and all eight counts.
+4. Rotate with `adb shell settings put system user_rotation 0` (or 1). Turning auto-rotate off first (`accelerometer_rotation 0`) makes the rotation stick. Each rotation recreates the activity, exactly as turning a real phone does.
+5. Save a screenshot with `adb exec-out screencap -p > shot.png` and look at it.
+
+**What was checked** in portrait and landscape on each device: 2, 3, 4 shows 2, then 23, then 234. CLEAR empties the amount and the table. 688 gives one of each note, and 6880 gives 13, 3, 1, 1, 1, 0, 0, 0, as in the brief's screenshots. Rotating portrait, landscape, portrait keeps the amount and the change list every time. Backspace deletes the last digit, and a 10th digit is refused. The phone and tablet layouts match the brief's screenshots. Half-size screenshots from these runs are in `docs/images/` (`emulator-pixel-xl-*.png` and `emulator-nexus-10-*.png`).
+
+**Other screen sizes** were emulated on the same two emulators. `adb shell wm size` and `wm density` change the screen Android reports, and the app picks its layouts from that, just as on a real device of that size:
+
+| Screen | Emulated on | `wm size` | `wm density` | dp |
+|:--|:--|:--|:--|:--|
+| Nexus 5 (small phone) | Pixel XL | 1080x1920 | 480 | 360 × 640 |
+| Medium phone (Pixel 7 size) | Pixel XL | 1080x2400 | 420 | 411 × 914 |
+| Nexus 7 (7-inch tablet) | Nexus 10 | 1920x1200 | 320 | 960 × 600 |
+| Pixel C (large tablet) | Nexus 10 | 2560x1800 | 320 | 1280 × 900 |
+
+On these the worst case was typed, 999999999 (1,999,999 five-hundreds), and checked in both orientations: everything stays on screen and readable. `wm size reset` and `wm density reset` put the emulator back.
+
+**What Android 5.0 found.** The first run on API 21 showed two problems that the newer emulators can't show:
+- **Every row of the change table was white**, so its light text was almost invisible. The rows were coloured with a background tint, and Android 5.0 can't tint shape drawables. They are now coloured with `GradientDrawable.setColor()` (Part 3, 16.10).
+- **The header's two glows spread into a pale blob** in the middle of the header, because layer-list items' `width`, `height` and `gravity` only work from API 23. The glowing header moved to `drawable-v23/`, and Android 5.0 and 5.1 get a plain gradient (Part 3, Step 9).
+
+After the fix, screenshots on the API 37 emulators were compared pixel by pixel with screenshots from before it: they are identical, so newer Android looks exactly as it did. The tablet layouts were also checked on Android 5.0, by emulating 800 × 1280 dp on the API 21 emulator. `docs/images/emulator-android-5-before.png` and `emulator-android-5-after.png` show the change table on Android 5.0 before and after the fix.
+
+**Pitfalls, if you script an emulator yourself:**
+- The Nexus 10's natural orientation is **landscape**, so `user_rotation 0` is landscape there and `1` is portrait. On the Pixel XL it is the other way round.
+- On the Android 5.0 image `/sdcard` isn't writable, and `uiautomator dump /sdcard/ui.xml` silently writes nothing. Use `/data/local/tmp/ui.xml`.
+- On Android 5.0, `screencap` saves landscape screens unrotated, so the picture comes out sideways. The layout itself is fine.
+- Git Bash on Windows rewrites arguments that look like paths (`/sdcard/...` becomes `C:/Program Files/Git/sdcard/...`). Set `MSYS_NO_PATHCONV=1`, or call `adb` from a script.
+
+### 5.3 The Robolectric "render harness" (how the README screenshots were made)
+
+Before emulators were set up, the app was developed and checked with a **copy of the project in a scratch folder** that had extra test tooling. The README's screenshots still come from it. This harness is *not* in the repository. Recreating it is a recommended improvement (Part 6).
 
 **Robolectric** runs Android code on your computer's JVM by simulating the Android framework. With `@GraphicsMode(GraphicsMode.Mode.NATIVE)` it really draws views with Android's graphics engine, so you can save pixel-accurate PNGs.
 
@@ -2002,16 +2073,16 @@ dependencies {
 
 **README screenshots** came from these renders. A tiny Java program (`javax.imageio`) cropped off the simulated navigation-bar strip, rounded the corners, and cut the round launcher icon out of an icon render to make `logo.png`.
 
-### 5.3 Devices covered
+### 5.4 Devices covered
 
-| Device | Size (dp) | Layout used |
-|:--|:--|:--|
-| Pixel XL (required) | 411 × 731 | `layout`, `layout-land` |
-| Nexus 10 (required) | 800 × 1280 | `layout-sw600dp`, `layout-sw600dp-land` |
-| Nexus 5 (small phone) | 360 × 640 | `layout`, `layout-land` |
-| Medium phone (Pixel 7 size) | 411 × 914 | `layout`, `layout-land` |
-| Nexus 7 (7-inch tablet) | 600 × 960 | `layout-sw600dp`, `layout-sw600dp-land` |
-| Pixel C (large tablet) | 900 × 1280 | `layout-sw600dp`, `layout-sw600dp-land` |
+| Device | Size (dp) | Layout used | Tested on |
+|:--|:--|:--|:--|
+| Pixel XL (required) | 411 × 731 | `layout`, `layout-land` | Pixel XL emulator, Android 17 and Android 5.0 |
+| Nexus 10 (required) | 800 × 1280 | `layout-sw600dp`, `layout-sw600dp-land` | Nexus 10 emulator, Android 17; also emulated on Android 5.0 |
+| Nexus 5 (small phone) | 360 × 640 | `layout`, `layout-land` | emulated on the Pixel XL emulator |
+| Medium phone (Pixel 7 size) | 411 × 914 | `layout`, `layout-land` | emulated on the Pixel XL emulator |
+| Nexus 7 (7-inch tablet) | 600 × 960 | `layout-sw600dp`, `layout-sw600dp-land` | emulated on the Nexus 10 emulator |
+| Pixel C (large tablet) | 900 × 1280 | `layout-sw600dp`, `layout-sw600dp-land` | emulated on the Nexus 10 emulator |
 
 ---
 
@@ -2037,12 +2108,13 @@ These are honest trade-offs. The current choices fit the assignment, but here is
 - **Spring animations** (`androidx.dynamicanimation`'s `SpringAnimation`) for the pops. They are physics-based and interrupt gracefully.
 - **Accelerating backspace repeat**: start at around 100 ms, speed up to around 40 ms after a second. Or add "hold for 2 s to clear".
 - **SplashScreen API** (`androidx.core:core-splashscreen`) for a branded launch screen on every Android version.
-- **Bitmap launcher icons.** Regenerate the `mipmap-*dpi` bitmaps from the adaptive icon (Android Studio's Image Asset tool can do this), so Android 7.x shows the VangtiChai icon instead of the template's robot.
+- **Bitmap launcher icons.** Regenerate the `mipmap-*dpi` bitmaps from the adaptive icon (Android Studio's Image Asset tool can do this), so Android 5.0 to 7.1 show the VangtiChai icon instead of the template's robot.
 - **Material You dynamic colour** (`DynamicColors.applyToActivitiesIfAvailable`) would follow the user's wallpaper. It was deliberately not used, to keep the Taka-green brand.
 
 ### Quality and tooling
 
 - **Keep the Robolectric tests in the repository.** Then the UI tests run with `./gradlew test`, with no emulator needed.
+- **Gradle Managed Devices** (`testOptions { managedDevices { ... } }`) let Gradle create the Pixel XL and Nexus 10 emulators itself and run the Espresso tests on both with one command. That would replace the hand-made AVDs and the adb script from 5.2.
 - **Screenshot testing** with **Roborazzi** or **Paparazzi** records reference images and fails if the UI changes unexpectedly. This is what the render harness did manually.
 - **CI** (GitHub Actions) can run `./gradlew test lint` on every push.
 - **Static analysis**: Android Lint (built in: `./gradlew lint`), and **ktlint** or **detekt** for Kotlin style.
@@ -2068,6 +2140,7 @@ These are honest trade-offs. The current choices fit the assignment, but here is
 | `e9f35bc` | 2026-10-14 | README clone URL updated. | The GitHub repository was renamed to `VhangtiChai_AndroidApp_CSE489`. |
 | `87347ba` | 2026-10-14 | **9-digit limit** (was 7). Change column widened from 36% to 40% in portrait. | Requested. The widening keeps the largest count readable on a 360 dp phone. |
 | `48ad475` | 2026-10-14 | **Dark-only theme. Smoother motion:** rows fade as one unit with opaque lit colours, plus an entrance animation. Light bar icons forced. | Requested: "dark theme default, no theme switching, smooth UI". |
+| after `9551e4e` | 2026-10-15 | **Minimum SDK 21 and emulator testing.** `minSdk` 24 → 21, with core-ktx 1.17.0, appcompat 1.7.1, activity-ktx 1.11.0 and material 1.13.0, the last releases that support API 21. Rows are coloured with `GradientDrawable.setColor()` instead of a background tint, and the header's glows moved to `drawable-v23/`. Tested on Pixel XL, Nexus 10 and Android 5.0 emulators; `README.txt` lists the results. | A check of the brief: it suggests API 21 and asks for testing *with the emulator* on a Pixel XL and a Nexus 10. Android 5.0 showed white rows and a blurred header, which the code changes fix. |
 
 ---
 
@@ -2116,7 +2189,7 @@ These are honest trade-offs. The current choices fit the assignment, but here is
 
 ## Appendix: Complete source code
 
-Every text file of the project, copied verbatim from the repository at the commit named at the top of this guide.
+Every text file of the project, copied verbatim from the project as it was on the date at the top of this guide.
 
 These are **not** listed here:
 - Binary files: the launcher icon bitmaps `app/src/main/res/mipmap-*dpi/*.webp`, `gradle/wrapper/gradle-wrapper.jar` and the screenshots in `docs/images/`.
@@ -2180,7 +2253,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.vangtichai"
-        minSdk = 24
+        minSdk = 21 // API 21 (Android 5.0), the minimum the assignment suggests
         targetSdk = 37
         versionCode = 1
         versionName = "1.0"
@@ -2222,10 +2295,11 @@ dependencies {
 ```toml
 [versions]
 agp = "9.4.1"
-coreKtx = "1.19.1"
-appcompat = "1.8.0"
-activityKtx = "1.13.0"
-material = "1.14.0"
+# Newest releases that still support minSdk 21 (later ones require API 23)
+coreKtx = "1.17.0"
+appcompat = "1.7.1"
+activityKtx = "1.11.0"
+material = "1.13.0"
 constraintlayout = "2.2.2"
 junit = "4.13.2"
 junitVersion = "1.3.0"
@@ -2449,8 +2523,8 @@ package com.example.vangtichai
 
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
-import android.content.res.ColorStateList
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import android.os.Bundle
 import android.view.HapticFeedbackConstants
@@ -2493,6 +2567,10 @@ class MainActivity : AppCompatActivity() {
 
     /** Change table rows, in the same order as [ChangeCalculator.NOTES]. */
     private lateinit var noteRows: List<ViewNoteRowBinding>
+
+    /** Each row's background and colour tab shapes, in the same order as [noteRows]. */
+    private lateinit var rowShapes: List<GradientDrawable>
+    private lateinit var accentShapes: List<GradientDrawable>
 
     /** Digit keys, indexed by their digit. */
     private lateinit var digitKeys: List<MaterialButton>
@@ -2556,6 +2634,10 @@ class MainActivity : AppCompatActivity() {
         noteRows.forEachIndexed { i, row ->
             row.noteLabel.text = getString(R.string.note_label, ChangeCalculator.NOTES[i])
         }
+        // Rows are coloured by setting their shapes' colour, not with a background tint: Android 5.0
+        // (API 21) can't tint shapes. mutate() gives every row its own copy to colour.
+        rowShapes = noteRows.map { it.root.background.mutate() as GradientDrawable }
+        accentShapes = noteRows.map { it.noteAccent.background.mutate() as GradientDrawable }
 
         digitKeys = with(binding) { listOf(key0, key1, key2, key3, key4, key5, key6, key7, key8, key9) }
         digitKeys.forEachIndexed { digit, key ->
@@ -2739,10 +2821,10 @@ class MainActivity : AppCompatActivity() {
         val noteColor = noteColors[index]
         row.noteLabel.setTextColor(ColorUtils.blendARGB(mutedTextColor, noteColor, level))
         row.noteCount.setTextColor(ColorUtils.blendARGB(mutedTextColor, strongTextColor, level))
-        row.noteAccent.backgroundTintList = ColorStateList.valueOf(
+        accentShapes[index].setColor(
             ColorUtils.blendARGB(ColorUtils.setAlphaComponent(noteColor, IDLE_ACCENT_ALPHA), noteColor, level)
         )
-        row.root.backgroundTintList = ColorStateList.valueOf(ColorUtils.blendARGB(idleRowColor, litRowColors[index], level))
+        rowShapes[index].setColor(ColorUtils.blendARGB(idleRowColor, litRowColors[index], level))
     }
 
     /**
@@ -5237,7 +5319,32 @@ class MainActivityTest {
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Header background: a green gradient with rounded bottom corners and two soft glows. -->
+<!--
+    Header background on Android 5.0 and 5.1 (API 21-22): the green gradient with rounded bottom
+    corners. These versions can't size or place layer-list items, so the two soft glows are left
+    out here; drawable-v23/bg_header.xml adds them on API 23 and newer.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:angle="315"
+        android:endColor="@color/header_gradient_end"
+        android:startColor="@color/header_gradient_start" />
+    <corners
+        android:bottomLeftRadius="@dimen/header_corner_radius"
+        android:bottomRightRadius="@dimen/header_corner_radius" />
+</shape>
+```
+
+#### `app/src/main/res/drawable-v23/bg_header.xml`
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Header background: a green gradient with rounded bottom corners and two soft glows.
+    The glows are sized and placed with the items' width, height and gravity, which Android only
+    supports from API 23 on. Older versions use drawable/bg_header.xml, which has no glows.
+-->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape android:shape="rectangle">
@@ -5285,7 +5392,7 @@ class MainActivityTest {
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Row of the change table. White so MainActivity can tint it with the note's colour. -->
+<!-- Row of the change table. MainActivity replaces the white with the row's colour. -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
     <solid android:color="@android:color/white" />
@@ -5297,7 +5404,7 @@ class MainActivityTest {
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Small colour tab at the start of each change table row; tinted per note in MainActivity. -->
+<!-- Small colour tab at the start of each change table row; MainActivity colours it per note. -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
     <solid android:color="@android:color/white" />
@@ -5515,7 +5622,7 @@ VangtiChai is an Android app (Kotlin, XML layouts) that calculates change for an
 Taka notes: 500, 100, 50, 20, 10, 5, 2 and 1. The amount is typed on a numeric keypad built
 from scratch with ConstraintLayout.
 
-Minimum SDK: API 24 (Android 7.0). Target/compile SDK: API 37.
+Minimum SDK: API 21 (Android 5.0 Lollipop), as the assignment suggests. Target/compile SDK: API 37.
 
 
 What the app does
@@ -5579,19 +5686,30 @@ All text is in res/values/strings.xml and all colours in res/values/colors.xml.
 
 Devices and screen types tested
 -------------------------------
-Each configuration below was checked by rendering the running app at that screen size and
-orientation (Robolectric with native graphics) after typing amounts such as 6, 68, 688, 6880
-and 999999999:
+Everything below was tested on the Android Emulator. On each device the on-screen keys were
+tapped to enter 2, 3 and 4 (showing 2, then 23, then 234), CLEAR, 688, 6880 and the 9-digit
+maximum 999999999, and the device was rotated portrait -> landscape -> portrait. The amount
+and the change list were kept on every rotation, and the counts match the assignment's
+screenshots (688: one of each note; 6880: 13, 3, 1, 1, 1, 0, 0, 0).
 
-  Pixel XL (required)          411 x 731 dp    portrait and landscape
-  Nexus 10 (required)          800 x 1280 dp   portrait and landscape
-  Nexus 5, small phone         360 x 640 dp    portrait and landscape
-  Medium Phone (Pixel 7 size)  411 x 914 dp    portrait and landscape
-  Nexus 7, 7-inch tablet       600 x 960 dp    portrait and landscape
-  Pixel C, large tablet        900 x 1280 dp   portrait and landscape
+Required devices, on Android 17 (API 37) emulator images:
 
-Rotation (portrait -> landscape -> portrait) was tested on the Pixel XL and Nexus 10 sizes:
-the amount and the change list are kept.
+  Pixel XL    1440 x 2560 px, 560 dpi = 411 x 731 dp    layout/ and layout-land/
+  Nexus 10    1600 x 2560 px, 320 dpi = 800 x 1280 dp   layout-sw600dp/ and layout-sw600dp-land/
+
+Other screen types, emulated on those two devices by changing the screen size and density
+(adb shell wm size / wm density), each in portrait and landscape:
+
+  Nexus 5, small phone          1080 x 1920 px, 480 dpi = 360 x 640 dp
+  Medium Phone (Pixel 7 size)   1080 x 2400 px, 420 dpi = 411 x 914 dp
+  Nexus 7, 7-inch tablet        1200 x 1920 px, 320 dpi = 600 x 960 dp
+  Pixel C, large tablet         1800 x 2560 px, 320 dpi = 900 x 1280 dp
+
+Oldest supported version: a Pixel XL emulator running Android 5.0 (API 21), with the phone
+layouts and the tablet layouts (at 800 x 1280 dp), in portrait and landscape.
+
+The 7 Espresso UI tests (see Tests below) pass on all three emulators: Pixel XL, Nexus 10 and
+Android 5.0.
 
 
 Tests

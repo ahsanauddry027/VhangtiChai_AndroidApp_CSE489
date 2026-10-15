@@ -2,8 +2,8 @@ package com.example.vangtichai
 
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
-import android.content.res.ColorStateList
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import android.os.Bundle
 import android.view.HapticFeedbackConstants
@@ -46,6 +46,10 @@ class MainActivity : AppCompatActivity() {
 
     /** Change table rows, in the same order as [ChangeCalculator.NOTES]. */
     private lateinit var noteRows: List<ViewNoteRowBinding>
+
+    /** Each row's background and colour tab shapes, in the same order as [noteRows]. */
+    private lateinit var rowShapes: List<GradientDrawable>
+    private lateinit var accentShapes: List<GradientDrawable>
 
     /** Digit keys, indexed by their digit. */
     private lateinit var digitKeys: List<MaterialButton>
@@ -109,6 +113,10 @@ class MainActivity : AppCompatActivity() {
         noteRows.forEachIndexed { i, row ->
             row.noteLabel.text = getString(R.string.note_label, ChangeCalculator.NOTES[i])
         }
+        // Rows are coloured by setting their shapes' colour, not with a background tint: Android 5.0
+        // (API 21) can't tint shapes. mutate() gives every row its own copy to colour.
+        rowShapes = noteRows.map { it.root.background.mutate() as GradientDrawable }
+        accentShapes = noteRows.map { it.noteAccent.background.mutate() as GradientDrawable }
 
         digitKeys = with(binding) { listOf(key0, key1, key2, key3, key4, key5, key6, key7, key8, key9) }
         digitKeys.forEachIndexed { digit, key ->
@@ -292,10 +300,10 @@ class MainActivity : AppCompatActivity() {
         val noteColor = noteColors[index]
         row.noteLabel.setTextColor(ColorUtils.blendARGB(mutedTextColor, noteColor, level))
         row.noteCount.setTextColor(ColorUtils.blendARGB(mutedTextColor, strongTextColor, level))
-        row.noteAccent.backgroundTintList = ColorStateList.valueOf(
+        accentShapes[index].setColor(
             ColorUtils.blendARGB(ColorUtils.setAlphaComponent(noteColor, IDLE_ACCENT_ALPHA), noteColor, level)
         )
-        row.root.backgroundTintList = ColorStateList.valueOf(ColorUtils.blendARGB(idleRowColor, litRowColors[index], level))
+        rowShapes[index].setColor(ColorUtils.blendARGB(idleRowColor, litRowColors[index], level))
     }
 
     /**

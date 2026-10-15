@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.vangtichai"
-        minSdk = 24
+        minSdk = 21 // API 21 (Android 5.0), the minimum the assignment suggests
         targetSdk = 37
         versionCode = 1
         versionName = "1.0"

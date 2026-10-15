@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Header background: a green gradient with rounded bottom corners and two soft glows.
+    The glows are sized and placed with the items' width, height and gravity, which Android only
+    supports from API 23 on. Older versions use drawable/bg_header.xml, which has no glows.
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="315"
+                android:endColor="@color/header_gradient_end"
+                android:startColor="@color/header_gradient_start" />
+            <corners
+                android:bottomLeftRadius="@dimen/header_corner_radius"
+                android:bottomRightRadius="@dimen/header_corner_radius" />
+        </shape>
+    </item>
+    <item
+        android:width="@dimen/header_glow_size"
+        android:height="@dimen/header_glow_size"
+        android:gravity="top|end"
+        android:right="@dimen/header_glow_offset"
+        android:top="@dimen/header_glow_offset">
+        <shape android:shape="oval">
+            <gradient
+                android:endColor="@android:color/transparent"
+                android:gradientRadius="@dimen/header_glow_radius"
+                android:startColor="@color/header_glow"
+                android:type="radial" />
+        </shape>
+    </item>
+    <item
+        android:width="@dimen/header_glow_size"
+        android:height="@dimen/header_glow_size"
+        android:gravity="top|start"
+        android:left="@dimen/header_glow_offset"
+        android:top="@dimen/header_glow_offset">
+        <shape android:shape="oval">
+            <gradient
+                android:endColor="@android:color/transparent"
+                android:gradientRadius="@dimen/header_glow_radius"
+                android:startColor="@color/header_glow"
+                android:type="radial" />
+        </shape>
+    </item>
+</layer-list>

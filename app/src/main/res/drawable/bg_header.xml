@@ -1,43 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Header background: a green gradient with rounded bottom corners and two soft glows. -->
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item>
-        <shape android:shape="rectangle">
-            <gradient
-                android:angle="315"
-                android:endColor="@color/header_gradient_end"
-                android:startColor="@color/header_gradient_start" />
-            <corners
-                android:bottomLeftRadius="@dimen/header_corner_radius"
-                android:bottomRightRadius="@dimen/header_corner_radius" />
-        </shape>
-    </item>
-    <item
-        android:width="@dimen/header_glow_size"
-        android:height="@dimen/header_glow_size"
-        android:gravity="top|end"
-        android:right="@dimen/header_glow_offset"
-        android:top="@dimen/header_glow_offset">
-        <shape android:shape="oval">
-            <gradient
-                android:endColor="@android:color/transparent"
-                android:gradientRadius="@dimen/header_glow_radius"
-                android:startColor="@color/header_glow"
-                android:type="radial" />
-        </shape>
-    </item>
-    <item
-        android:width="@dimen/header_glow_size"
-        android:height="@dimen/header_glow_size"
-        android:gravity="top|start"
-        android:left="@dimen/header_glow_offset"
-        android:top="@dimen/header_glow_offset">
-        <shape android:shape="oval">
-            <gradient
-                android:endColor="@android:color/transparent"
-                android:gradientRadius="@dimen/header_glow_radius"
-                android:startColor="@color/header_glow"
-                android:type="radial" />
-        </shape>
-    </item>
-</layer-list>
+<!--
+    Header background on Android 5.0 and 5.1 (API 21-22): the green gradient with rounded bottom
+    corners. These versions can't size or place layer-list items, so the two soft glows are left
+    out here; drawable-v23/bg_header.xml adds them on API 23 and newer.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:angle="315"
+        android:endColor="@color/header_gradient_end"
+        android:startColor="@color/header_gradient_start" />
+    <corners
+        android:bottomLeftRadius="@dimen/header_corner_radius"
+        android:bottomRightRadius="@dimen/header_corner_radius" />
+</shape>

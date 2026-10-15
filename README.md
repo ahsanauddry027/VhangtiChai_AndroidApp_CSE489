@@ -13,7 +13,7 @@ A Taka change calculator for Android. Type an amount and see exactly which notes
 ![Kotlin](https://img.shields.io/badge/Kotlin-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white)
 ![Android](https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)
 ![Material 3](https://img.shields.io/badge/Material%203-006C4E?style=for-the-badge&logo=materialdesign&logoColor=white)
-![Min SDK](https://img.shields.io/badge/Min%20SDK-24-0F9D6C?style=for-the-badge)
+![Min SDK](https://img.shields.io/badge/Min%20SDK-21-0F9D6C?style=for-the-badge)
 ![Target SDK](https://img.shields.io/badge/Target%20SDK-37-01543B?style=for-the-badge)
 
 <br>
@@ -115,7 +115,7 @@ The layout files contain no hardcoded values. Text sizes, margins, paddings, cor
 
 ### Tested screen sizes
 
-Each size was rendered in portrait and landscape after typing amounts such as 6, 68, 688, 6880 and 999999999.
+Every size was tested on the Android Emulator in portrait and landscape: tapping in 2, 23, 234, 688, 6880 and 999999999, clearing, and rotating back and forth, which kept the amount and the change list every time. The Pixel XL and Nexus 10 are emulator devices running Android 17. The other sizes were emulated on them with `adb shell wm size` and `wm density`.
 
 | Device | Size | |
 |:--|:--|:--|
@@ -125,6 +125,8 @@ Each size was rendered in portrait and landscape after typing amounts such as 6,
 | Medium Phone | 411 × 914 dp | Pixel 7 size |
 | Nexus 7 | 600 × 960 dp | 7-inch tablet |
 | Pixel C | 900 × 1280 dp | large tablet |
+
+The app also runs on the oldest version it supports: a Pixel XL emulator with Android 5.0 (API 21), using both the phone and the tablet layouts.
 
 ## 🛠️ Tech stack
 
@@ -141,7 +143,7 @@ git clone https://github.com/ahsanauddry027/VhangtiChai_AndroidApp_CSE489.git
 cd VhangtiChai_AndroidApp_CSE489
 ```
 
-Open the folder in **Android Studio**, wait for the Gradle sync to finish, then run the `app` configuration on an emulator or a device with Android 7.0 (API 24) or newer.
+Open the folder in **Android Studio**, wait for the Gradle sync to finish, then run the `app` configuration on an emulator or a device with Android 5.0 (API 21) or newer.
 
 To build from the command line instead:
 
@@ -156,7 +158,7 @@ On Windows, use `gradlew.bat` in place of `./gradlew`.
 | Command | What it runs |
 |:--|:--|
 | `./gradlew test` | JVM unit tests for the change logic: the examples from the assignment, the 9-digit limit, backspace, and a check that the fewest notes are always used |
-| `./gradlew connectedAndroidTest` | Espresso UI tests for typing, CLEAR, backspace (tap and hold), and keeping state across activity recreation (needs a device or emulator) |
+| `./gradlew connectedAndroidTest` | Espresso UI tests for typing, CLEAR, backspace (tap and hold), and keeping state across activity recreation. They need a device or emulator, and pass on the Pixel XL, Nexus 10 and Android 5.0 emulators |
 
 ## 📂 Project structure
 

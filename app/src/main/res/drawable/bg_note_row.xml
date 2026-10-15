@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Row of the change table. White so MainActivity can tint it with the note's colour. -->
+<!-- Row of the change table. MainActivity replaces the white with the row's colour. -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
     <solid android:color="@android:color/white" />

@@ -1,9 +1,10 @@
 [versions]
 agp = "9.4.1"
-coreKtx = "1.19.1"
-appcompat = "1.8.0"
-activityKtx = "1.13.0"
-material = "1.14.0"
+# Newest releases that still support minSdk 21 (later ones require API 23)
+coreKtx = "1.17.0"
+appcompat = "1.7.1"
+activityKtx = "1.11.0"
+material = "1.13.0"
 constraintlayout = "2.2.2"
 junit = "4.13.2"
 junitVersion = "1.3.0"

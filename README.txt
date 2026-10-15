@@ -5,7 +5,7 @@ VangtiChai is an Android app (Kotlin, XML layouts) that calculates change for an
 Taka notes: 500, 100, 50, 20, 10, 5, 2 and 1. The amount is typed on a numeric keypad built
 from scratch with ConstraintLayout.
 
-Minimum SDK: API 24 (Android 7.0). Target/compile SDK: API 37.
+Minimum SDK: API 21 (Android 5.0 Lollipop), as the assignment suggests. Target/compile SDK: API 37.
 
 
 What the app does
@@ -69,19 +69,30 @@ All text is in res/values/strings.xml and all colours in res/values/colors.xml.
 
 Devices and screen types tested
 -------------------------------
-Each configuration below was checked by rendering the running app at that screen size and
-orientation (Robolectric with native graphics) after typing amounts such as 6, 68, 688, 6880
-and 999999999:
+Everything below was tested on the Android Emulator. On each device the on-screen keys were
+tapped to enter 2, 3 and 4 (showing 2, then 23, then 234), CLEAR, 688, 6880 and the 9-digit
+maximum 999999999, and the device was rotated portrait -> landscape -> portrait. The amount
+and the change list were kept on every rotation, and the counts match the assignment's
+screenshots (688: one of each note; 6880: 13, 3, 1, 1, 1, 0, 0, 0).
 
-  Pixel XL (required)          411 x 731 dp    portrait and landscape
-  Nexus 10 (required)          800 x 1280 dp   portrait and landscape
-  Nexus 5, small phone         360 x 640 dp    portrait and landscape
-  Medium Phone (Pixel 7 size)  411 x 914 dp    portrait and landscape
-  Nexus 7, 7-inch tablet       600 x 960 dp    portrait and landscape
-  Pixel C, large tablet        900 x 1280 dp   portrait and landscape
+Required devices, on Android 17 (API 37) emulator images:
 
-Rotation (portrait -> landscape -> portrait) was tested on the Pixel XL and Nexus 10 sizes:
-the amount and the change list are kept.
+  Pixel XL    1440 x 2560 px, 560 dpi = 411 x 731 dp    layout/ and layout-land/
+  Nexus 10    1600 x 2560 px, 320 dpi = 800 x 1280 dp   layout-sw600dp/ and layout-sw600dp-land/
+
+Other screen types, emulated on those two devices by changing the screen size and density
+(adb shell wm size / wm density), each in portrait and landscape:
+
+  Nexus 5, small phone          1080 x 1920 px, 480 dpi = 360 x 640 dp
+  Medium Phone (Pixel 7 size)   1080 x 2400 px, 420 dpi = 411 x 914 dp
+  Nexus 7, 7-inch tablet        1200 x 1920 px, 320 dpi = 600 x 960 dp
+  Pixel C, large tablet         1800 x 2560 px, 320 dpi = 900 x 1280 dp
+
+Oldest supported version: a Pixel XL emulator running Android 5.0 (API 21), with the phone
+layouts and the tablet layouts (at 800 x 1280 dp), in portrait and landscape.
+
+The 7 Espresso UI tests (see Tests below) pass on all three emulators: Pixel XL, Nexus 10 and
+Android 5.0.
 
 
 Tests
