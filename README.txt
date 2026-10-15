@@ -64,6 +64,9 @@ layout proportions are defined in sizes.xml for each configuration:
   res/values-sw600dp/sizes.xml       tablets, portrait
   res/values-sw600dp-land/sizes.xml  tablets, landscape
 
+Even ConstraintLayout's "match constraints" size, 0dp, is not written in the layouts: they use
+@dimen/match_constraint, defined once in res/values/sizes.xml.
+
 All text is in res/values/strings.xml and all colours in res/values/colors.xml.
 
 

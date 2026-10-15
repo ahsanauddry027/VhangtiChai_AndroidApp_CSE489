@@ -7,6 +7,10 @@
       values-sw600dp-land/  tablets in landscape
 -->
 <resources>
+    <!-- ConstraintLayout's "match constraints": a width or height of 0 lets a view stretch between
+         its constraints. Kept here like every other size, so no size is hardcoded in a layout. -->
+    <dimen name="match_constraint">0dp</dimen>
+
     <!-- Space around and between the main sections -->
     <dimen name="screen_margin">16dp</dimen>
     <dimen name="section_gap">16dp</dimen>

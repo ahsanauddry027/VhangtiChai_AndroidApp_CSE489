@@ -78,7 +78,7 @@ README.md    GitHub landing page with screenshots (images in docs/images/)
 
 ### Hard rules you must keep
 
-1. **No hardcoded values in layout XML.** The assignment says sizes, paddings and margins must come from `sizes.xml`. Every number in a layout is a `@dimen/...`, `@integer/...` or `@string/...` reference. Add new values to `values/sizes.xml`, and override them in `values-land`, `values-sw600dp` or `values-sw600dp-land` only where they differ.
+1. **No hardcoded values in layout XML.** The assignment says sizes, paddings and margins must come from `sizes.xml`. Every number in a layout is a `@dimen/...`, `@integer/...` or `@string/...` reference, even ConstraintLayout's `0dp`, which is written `@dimen/match_constraint`. Only `tools:` preview text, which never reaches the app, contains literal numbers. Add new values to `values/sizes.xml`, and override them in `values-land`, `values-sw600dp` or `values-sw600dp-land` only where they differ. Android Studio's design view writes a literal `0dp` when you pick "match constraints" there; replace it with `@dimen/match_constraint`.
 2. **Four layouts, all `ConstraintLayout`.** Any view you add must be added to **all four** `activity_main.xml` files with the **same id**. View Binding generates one class from all of them. An id missing from some layouts becomes a nullable field.
 3. **Keypad configuration is fixed by the assignment brief.**
    - Portrait: rows `1 2 3`, `4 5 6`, `7 8 9`, then `0` + a wide `CLEAR`.
@@ -165,7 +165,7 @@ It then lists the requirements, which are mapped to the implementation below. It
 | 4 | Layouts work gracefully on phones and tablets. Test with the emulator on at least a Pixel XL and a Nexus 10. | Four layouts chosen by resource qualifiers (`-land`, `-sw600dp`). Tested on Pixel XL and Nexus 10 emulators in both orientations, plus four more screen sizes and Android 5.0. | Part 5 |
 | Hint | "4 different layouts" are enough for full credit. | Exactly four `activity_main.xml` variants. | `res/layout*/` |
 | Hint | List the other devices and screen types you tested in `README.txt`. | `README.txt` lists the two required devices, four more screen sizes (in px, dpi and dp) and Android 5.0. | `README.txt` |
-| Hint | Do not hardcode values in layout XML. Put sizes in `sizes.xml` and reference them. | Every size is a `@dimen` from one of the four `sizes.xml` files. Text is in `strings.xml` and colours in `colors.xml`. | `res/values*/sizes.xml` |
+| Hint | Do not hardcode values in layout XML. Put sizes in `sizes.xml` and reference them. | Every size is a `@dimen` from one of the four `sizes.xml` files, even ConstraintLayout's `0dp` (`@dimen/match_constraint`). Text is in `strings.xml` and colours in `colors.xml`. | `res/values*/sizes.xml` |
 | Hint | Kotlin, Java or Flutter, and a minimum API level of 21 ("or lower if need be"). | Kotlin, and min SDK 21 (Android 5.0). The libraries are pinned to their last releases that support API 21, and the app was run on an Android 5.0 emulator. | `app/build.gradle.kts`, `gradle/libs.versions.toml` |
 
 **Every requirement is met.** Each one was checked on the final build with the Android Emulator: on the Pixel XL and the Nexus 10 that the brief names, in portrait and landscape, and on Android 5.0, the minimum version (Part 5.2).
@@ -444,7 +444,7 @@ A layout XML file describes that tree:
 <TextView                                         <!-- the class to create -->
     android:id="@+id/amount_text"                 <!-- "@+id/" CREATES an id named amount_text -->
     style="@style/Widget.VangtiChai.Amount"       <!-- apply a bundle of attributes from styles.xml -->
-    android:layout_width="0dp"                    <!-- width: 0dp means "decided by constraints" -->
+    android:layout_width="@dimen/match_constraint" <!-- 0dp: "decided by constraints" (see 2.9) -->
     android:layout_height="@dimen/amount_height"  <!-- height from sizes.xml -->
     android:text="@string/label_taka"             <!-- initial text from strings.xml -->
     app:layout_constraintTop_toBottomOf="@id/toolbar"  <!-- "@id/" REFERS to an existing id -->
@@ -452,7 +452,7 @@ A layout XML file describes that tree:
 ```
 
 - **Namespaces.** `android:` is for attributes built into Android. `app:` is for attributes defined by libraries (ConstraintLayout, Material). `tools:` is for design-time hints that never reach the app, such as preview text, `tools:visibility` and `tools:context`. They are declared once on the root element (`xmlns:android=...`, `xmlns:app=...`, `xmlns:tools=...`).
-- **`layout_width` / `layout_height`** are required on every view. The values are a size (`@dimen/...`), `wrap_content` (as big as the content), `match_parent` (as big as the parent), or `0dp`, which inside a ConstraintLayout means "match constraints" (see 2.9).
+- **`layout_width` / `layout_height`** are required on every view. The values are a size (`@dimen/...`), `wrap_content` (as big as the content), `match_parent` (as big as the parent), or `0dp`, which inside a ConstraintLayout means "match constraints" (see 2.9). VangtiChai's layouts write that `0dp` as `@dimen/match_constraint`.
 - **References.** `@string/...`, `@dimen/...` and `@color/...` point to resources. `?attr/colorPrimary` points to a **theme attribute**: "whatever the current theme says the primary colour is".
 - **`<include layout="@layout/view_note_row" android:id="@+id/note_500" .../>`** inserts another layout file as a child. VangtiChai includes the same row layout 8 times, giving each copy a different id.
 
@@ -471,7 +471,9 @@ app:layout_constraintBottom_toBottomOf="parent"   <!-- my bottom sticks to the p
 
 "Start/End" mean left/right in left-to-right languages. VangtiChai forces left-to-right with `android:layoutDirection="ltr"` on the root, so start is always left.
 
-**`0dp` = match constraints.** With constraints on both sides and a size of `0dp`, the view **stretches to fill the space between its constraints**. The change card uses `0dp` × `0dp`, so it fills from the screen's left edge to the `split` guideline, and from below the header to the screen's bottom.
+**`0dp` = match constraints.** With constraints on both sides and a size of `0dp`, the view **stretches to fill the space between its constraints**. The change card uses it for both width and height, so it fills from the screen's left edge to the `split` guideline, and from below the header to the screen's bottom.
+
+**`@dimen/match_constraint`.** VangtiChai never writes `0dp` in a layout. `values/sizes.xml` defines `<dimen name="match_constraint">0dp</dimen>`, and the layouts use `@dimen/match_constraint` instead, so even this zero is not hardcoded, as the brief asks. ConstraintLayout only sees the final value, 0, so it behaves exactly as a written `0dp` would. This was checked on the emulators: every view has the same position and size as with a written `0dp` (Part 5.2).
 
 **Margins** (`android:layout_marginTop="@dimen/section_gap"`) add space between the edge and what it is attached to.
 
@@ -895,6 +897,7 @@ Create `res/values/sizes.xml` (phone portrait, the defaults) and three override 
 ```
 
 The base file is grouped by area:
+- **Match constraints:** `match_constraint` (`0dp`), which the layouts use for every width or height that stretches between constraints (Part 2.9)
 - **Spacing:** `screen_margin`, `section_gap`, `column_gap`
 - **Header:** corner radius, paddings, glow geometry, toolbar height and text sizes, `amount_height`, the amount's auto-size range `amount_text_min`/`amount_text_max`, `amount_side_margin`, caption size, `shake_distance`, `entrance_rise`, and the backspace key's `backspace_size`, `backspace_icon_size` and `backspace_margin_end`
 - **Change table:** card radius, stroke, paddings, row gap, row corner radius, colour tab size, label text size, the count's auto-size range
@@ -1110,7 +1113,7 @@ Create a new layout file. It is one row: a colour tab, the note label ("500:"), 
 
     <View android:id="@+id/note_accent"                   <!-- the small colour tab -->
         android:layout_width="@dimen/note_accent_width"
-        android:layout_height="0dp"
+        android:layout_height="@dimen/match_constraint"  <!-- 0dp: set by the percent below -->
         android:background="@drawable/bg_note_accent"
         app:layout_constraintHeight_percent="@dimen/note_accent_height_percent"  <!-- 50% of the row -->
         app:layout_constraintStart_toStartOf="parent"
@@ -1129,8 +1132,8 @@ Create a new layout file. It is one row: a colour tab, the note label ("500:"), 
 
     <TextView android:id="@+id/note_count"                <!-- "1" -->
         style="@style/Widget.VangtiChai.NoteCount"
-        android:layout_width="0dp"                        <!-- fills from the label to the row's end -->
-        android:layout_height="0dp"                       <!-- and the full row height: needed for auto-size -->
+        android:layout_width="@dimen/match_constraint"   <!-- fills from the label to the row's end -->
+        android:layout_height="@dimen/match_constraint"  <!-- and the full row height: needed for auto-size -->
         android:layout_marginStart="@dimen/note_count_margin_start"
         android:importantForAccessibility="no"
         app:layout_constraintStart_toEndOf="@id/note_label"
@@ -1140,7 +1143,7 @@ Create a new layout file. It is one row: a colour tab, the note label ("500:"), 
 </androidx.constraintlayout.widget.ConstraintLayout>
 ```
 
-*Why `0dp` × `0dp` for the count?* **Auto-sizing text needs a fixed box.** With `wrap_content` the box would just grow with the text, and the text would never shrink.
+*Why match constraints in both directions for the count?* **Auto-sizing text needs a fixed box.** With `wrap_content` the box would just grow with the text, and the text would never shrink.
 
 *Why one reusable row file?* Eight identical rows written out by hand would be 8 copies to keep in sync. `<include>` keeps one source of truth.
 
@@ -1172,7 +1175,8 @@ root (ConstraintLayout)
 ```xml
 <androidx.constraintlayout.widget.ConstraintLayout
     android:id="@+id/header"
-    android:layout_width="0dp" android:layout_height="0dp"
+    android:layout_width="@dimen/match_constraint"
+    android:layout_height="@dimen/match_constraint"
     android:background="@drawable/bg_header"
     android:paddingBottom="@dimen/header_padding_bottom"
     app:layout_constraintHeight_default="percent"                       <!-- height is a percentage... -->
@@ -1185,7 +1189,7 @@ root (ConstraintLayout)
 
 Inside it:
 - **The toolbar** sits at the top.
-- **`amount_text`** has `layout_width="0dp"` with equal start and end margins (`amount_side_margin`). That gives a centred box, with room on the right for the backspace key. Its fixed height (`amount_height`) is what lets its text auto-size.
+- **`amount_text`** has `layout_width="@dimen/match_constraint"` (match constraints) with equal start and end margins (`amount_side_margin`). That gives a centred box, with room on the right for the backspace key. Its fixed height (`amount_height`) is what lets its text auto-size.
 - **The amount and caption** form a **packed vertical chain** (`app:layout_constraintVertical_chainStyle="packed"` on the first one): `toolbar.bottom ← amount ⇄ caption → header.bottom`. Packed means "keep them together, centred in the leftover space".
 - **The backspace key** is `backspace_size` square. Its top and bottom are constrained to the amount's top and bottom, which centres it on the amount row. Its end is constrained to the parent's end with `backspace_margin_end`. It starts `android:visibility="invisible"`. `tools:visibility="visible"` shows it in Android Studio's preview only.
 
@@ -1198,7 +1202,8 @@ Inside it:
 
 <com.google.android.material.card.MaterialCardView android:id="@+id/notes_card"
     style="@style/Widget.VangtiChai.Card"
-    android:layout_width="0dp" android:layout_height="0dp"
+    android:layout_width="@dimen/match_constraint"
+    android:layout_height="@dimen/match_constraint"
     android:layout_marginStart="@dimen/screen_margin"
     android:layout_marginTop="@dimen/section_gap"
     android:layout_marginBottom="@dimen/screen_margin"
@@ -1210,17 +1215,19 @@ Inside it:
     app:layout_constraintVertical_bias="@dimen/content_vertical_bias">    <!-- if capped, centre it -->
 ```
 
-Inside the card, a `ConstraintLayout` holds the title and the 8 rows. The rows form a vertical chain from the title down to the bottom, all with `layout_height="0dp"`, so they share the height **equally**:
+Inside the card, a `ConstraintLayout` holds the title and the 8 rows. The rows form a vertical chain from the title down to the bottom, all with `layout_height="@dimen/match_constraint"`, so they share the height **equally**:
 
 ```xml
 <include android:id="@+id/note_500" layout="@layout/view_note_row"
-    android:layout_width="0dp" android:layout_height="0dp"
+    android:layout_width="@dimen/match_constraint"
+    android:layout_height="@dimen/match_constraint"
     android:layout_marginTop="@dimen/notes_title_margin_vertical"
     app:layout_constraintTop_toBottomOf="@id/notes_title"
     app:layout_constraintBottom_toTopOf="@id/note_100"
     app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" />
 <include android:id="@+id/note_100" layout="@layout/view_note_row"
-    android:layout_width="0dp" android:layout_height="0dp"
+    android:layout_width="@dimen/match_constraint"
+    android:layout_height="@dimen/match_constraint"
     android:layout_marginTop="@dimen/note_row_gap"
     app:layout_constraintTop_toBottomOf="@id/note_500"
     app:layout_constraintBottom_toTopOf="@id/note_50" ... />
@@ -1236,7 +1243,8 @@ Inside the card, a `ConstraintLayout` holds the title and the 8 rows. The rows f
 
 ```xml
 <androidx.constraintlayout.widget.ConstraintLayout android:id="@+id/keypad"
-    android:layout_width="0dp" android:layout_height="0dp"
+    android:layout_width="@dimen/match_constraint"
+    android:layout_height="@dimen/match_constraint"
     android:layout_marginStart="@dimen/column_gap"
     android:layout_marginEnd="@dimen/screen_margin"
     app:layout_constraintStart_toEndOf="@id/split"
@@ -1247,8 +1255,8 @@ Inside the card, a `ConstraintLayout` holds the title and the 8 rows. The rows f
 
 The 11 keys are arranged with chains:
 
-- **Each of rows 1 to 3 is a horizontal chain:** `parent.start ← key_1 ⇄ key_2 ⇄ key_3 → parent.end`. All have width `0dp`, so the three columns are equal. `key_2` and `key_3` have `layout_marginStart="@dimen/key_gap"` for the gaps.
-- **The first column is a vertical chain:** `parent.top ← key_1 ⇄ key_4 ⇄ key_7 ⇄ key_0 → parent.bottom`, all height `0dp`, giving four equal rows with `key_gap` between them.
+- **Each of rows 1 to 3 is a horizontal chain:** `parent.start ← key_1 ⇄ key_2 ⇄ key_3 → parent.end`. All have width `@dimen/match_constraint`, so the three columns are equal. `key_2` and `key_3` have `layout_marginStart="@dimen/key_gap"` for the gaps.
+- **The first column is a vertical chain:** `parent.top ← key_1 ⇄ key_4 ⇄ key_7 ⇄ key_0 → parent.bottom`, all height `@dimen/match_constraint`, giving four equal rows with `key_gap` between them.
 - **Other keys copy their row's height** by constraining top and bottom to the first key of their row. For example, `key_5` has `top_toTopOf="@id/key_4"` and `bottom_toBottomOf="@id/key_4"`.
 - **`key_0`** takes its start and end from `key_7`, so it is one column wide.
 - **CLEAR spans two columns** by taking its start from `key_8` and its end from `key_9`, with top and bottom from `key_0`.
@@ -1256,7 +1264,8 @@ The 11 keys are arranged with chains:
 ```xml
 <com.google.android.material.button.MaterialButton android:id="@+id/key_clear"
     style="@style/Widget.VangtiChai.Key.Clear"
-    android:layout_width="0dp" android:layout_height="0dp"
+    android:layout_width="@dimen/match_constraint"
+    android:layout_height="@dimen/match_constraint"
     android:contentDescription="@string/cd_key_clear"
     android:text="@string/key_clear"
     app:layout_constraintStart_toStartOf="@id/key_8"
@@ -1966,6 +1975,7 @@ git push -u origin main                    # upload; -u remembers origin/main fo
 | 25 | **`README.txt` *and* `README.md`** | The `.txt` is the required deliverable. The `.md` is GitHub's landing page with screenshots. | Only one: either fails the brief or looks bare on GitHub. |
 | 26 | **Minimum SDK 21, with libraries pinned to their last API 21 releases** | The brief names API 21 ("or lower if need be"), and a grader's emulator may run an old Android. The pinned versions have every feature the app uses. | `minSdk` 24 (the template default) with the newest libraries: the app can't be installed below Android 7.0. |
 | 27 | **Rows coloured with `GradientDrawable.setColor()`** | Works on every Android version. A background tint can't colour shapes on Android 5.0, where the rows stayed white. | `backgroundTintList`, used before: breaks on API 21. `DrawableCompat.wrap()` plus a tint also works there, but needs more code. |
+| 28 | **Even `0dp` comes from `sizes.xml`** (`@dimen/match_constraint`) | The brief says not to hardcode *any* values in layouts, and a strict reading includes ConstraintLayout's `0dp`. ConstraintLayout gets the same 0 either way, so nothing changes on screen. | Writing `0dp`, as Android's docs and Android Studio do: shorter, but the one number left in the layouts. |
 
 ---
 
@@ -2013,6 +2023,8 @@ On these the worst case was typed, 999999999 (1,999,999 five-hundreds), and chec
 - **The header's two glows spread into a pale blob** in the middle of the header, because layer-list items' `width`, `height` and `gravity` only work from API 23. The glowing header moved to `drawable-v23/`, and Android 5.0 and 5.1 get a plain gradient (Part 3, Step 9).
 
 After the fix, screenshots on the API 37 emulators were compared pixel by pixel with screenshots from before it: they are identical, so newer Android looks exactly as it did. The tablet layouts were also checked on Android 5.0, by emulating 800 × 1280 dp on the API 21 emulator. `docs/images/emulator-android-5-before.png` and `emulator-android-5-after.png` show the change table on Android 5.0 before and after the fix.
+
+**Moving `0dp` into `sizes.xml`.** When the layouts' `0dp` became `@dimen/match_constraint` (Part 2.9), the app before and after the change was installed on the same emulators, and every view's position and size was read from the accessibility tree once the animations had settled. That covered portrait and landscape on the Nexus 10 emulator, also at the Pixel XL and Nexus 5 sizes, and on Android 5.0 at the Pixel XL and Nexus 10 sizes. Every view was in exactly the same place, and the 7 Espresso tests passed on all three emulators. Screenshots alone can't prove this: a key caught at a slightly different moment of its press animation already changes a few pixels.
 
 **Pitfalls, if you script an emulator yourself:**
 - The Nexus 10's natural orientation is **landscape**, so `user_rotation 0` is landscape there and `1` is portrait. On the Pixel XL it is the other way round.
@@ -2140,7 +2152,8 @@ These are honest trade-offs. The current choices fit the assignment, but here is
 | `e9f35bc` | 2026-10-14 | README clone URL updated. | The GitHub repository was renamed to `VhangtiChai_AndroidApp_CSE489`. |
 | `87347ba` | 2026-10-14 | **9-digit limit** (was 7). Change column widened from 36% to 40% in portrait. | Requested. The widening keeps the largest count readable on a 360 dp phone. |
 | `48ad475` | 2026-10-14 | **Dark-only theme. Smoother motion:** rows fade as one unit with opaque lit colours, plus an entrance animation. Light bar icons forced. | Requested: "dark theme default, no theme switching, smooth UI". |
-| after `9551e4e` | 2026-10-15 | **Minimum SDK 21 and emulator testing.** `minSdk` 24 → 21, with core-ktx 1.17.0, appcompat 1.7.1, activity-ktx 1.11.0 and material 1.13.0, the last releases that support API 21. Rows are coloured with `GradientDrawable.setColor()` instead of a background tint, and the header's glows moved to `drawable-v23/`. Tested on Pixel XL, Nexus 10 and Android 5.0 emulators; `README.txt` lists the results. | A check of the brief: it suggests API 21 and asks for testing *with the emulator* on a Pixel XL and a Nexus 10. Android 5.0 showed white rows and a blurred header, which the code changes fix. |
+| `bcb849f` | 2026-10-15 | **Minimum SDK 21 and emulator testing.** `minSdk` 24 → 21, with core-ktx 1.17.0, appcompat 1.7.1, activity-ktx 1.11.0 and material 1.13.0, the last releases that support API 21. Rows are coloured with `GradientDrawable.setColor()` instead of a background tint, and the header's glows moved to `drawable-v23/`. Tested on Pixel XL, Nexus 10 and Android 5.0 emulators; `README.txt` lists the results. | A check of the brief: it suggests API 21 and asks for testing *with the emulator* on a Pixel XL and a Nexus 10. Android 5.0 showed white rows and a blurred header, which the code changes fix. |
+| after `bcb849f` | 2026-10-15 | **No `0dp` in the layouts.** All 192 of ConstraintLayout's `0dp` widths and heights became `@dimen/match_constraint`, defined once in `values/sizes.xml`. | The brief says not to hardcode any values in layout files, and `0dp` was the last number in them. Every view's position and size was checked to be unchanged on the emulators. |
 
 ---
 
@@ -3297,6 +3310,10 @@ class MainActivityTest {
       values-sw600dp-land/  tablets in landscape
 -->
 <resources>
+    <!-- ConstraintLayout's "match constraints": a width or height of 0 lets a view stretch between
+         its constraints. Kept here like every other size, so no size is hardcoded in a layout. -->
+    <dimen name="match_constraint">0dp</dimen>
+
     <!-- Space around and between the main sections -->
     <dimen name="screen_margin">16dp</dimen>
     <dimen name="section_gap">16dp</dimen>
@@ -3723,7 +3740,7 @@ class MainActivityTest {
     <View
         android:id="@+id/note_accent"
         android:layout_width="@dimen/note_accent_width"
-        android:layout_height="0dp"
+        android:layout_height="@dimen/match_constraint"
         android:background="@drawable/bg_note_accent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHeight_percent="@dimen/note_accent_height_percent"
@@ -3745,8 +3762,8 @@ class MainActivityTest {
     <TextView
         android:id="@+id/note_count"
         style="@style/Widget.VangtiChai.NoteCount"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="@dimen/match_constraint"
+        android:layout_height="@dimen/match_constraint"
         android:layout_marginStart="@dimen/note_count_margin_start"
         android:importantForAccessibility="no"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -3783,8 +3800,8 @@ class MainActivityTest {
     -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/header"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="@dimen/match_constraint"
+        android:layout_height="@dimen/match_constraint"
         android:background="@drawable/bg_header"
         android:paddingBottom="@dimen/header_padding_bottom"
         app:layout_constraintEnd_toEndOf="parent"
@@ -3797,7 +3814,7 @@ class MainActivityTest {
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             style="@style/Widget.VangtiChai.Toolbar"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/match_constraint"
             android:layout_height="?attr/actionBarSize"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -3807,7 +3824,7 @@ class MainActivityTest {
         <TextView
             android:id="@+id/amount_text"
             style="@style/Widget.VangtiChai.Amount"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/match_constraint"
             android:layout_height="@dimen/amount_height"
             android:layout_marginStart="@dimen/amount_side_margin"
             android:layout_marginEnd="@dimen/amount_side_margin"
@@ -3837,7 +3854,7 @@ class MainActivityTest {
         <TextView
             android:id="@+id/caption_text"
             style="@style/Widget.VangtiChai.Caption"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/match_constraint"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/header_padding_horizontal"
             android:layout_marginTop="@dimen/caption_margin_top"
@@ -3864,8 +3881,8 @@ class MainActivityTest {
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/notes_card"
         style="@style/Widget.VangtiChai.Card"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="@dimen/match_constraint"
+        android:layout_height="@dimen/match_constraint"
         android:layout_marginStart="@dimen/screen_margin"
         android:layout_marginTop="@dimen/section_gap"
         android:layout_marginBottom="@dimen/screen_margin"
@@ -3884,7 +3901,7 @@ class MainActivityTest {
             <TextView
                 android:id="@+id/notes_title"
                 style="@style/Widget.VangtiChai.NotesTitle"
-                android:layout_width="0dp"
+                android:layout_width="@dimen/match_constraint"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/notes_title_margin_horizontal"
                 android:layout_marginTop="@dimen/notes_title_margin_vertical"
@@ -3898,8 +3915,8 @@ class MainActivityTest {
             <include
                 android:id="@+id/note_500"
                 layout="@layout/view_note_row"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_width="@dimen/match_constraint"
+                android:layout_height="@dimen/match_constraint"
                 android:layout_marginTop="@dimen/notes_title_margin_vertical"
                 app:layout_constraintBottom_toTopOf="@id/note_100"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -3909,8 +3926,8 @@ class MainActivityTest {
             <include
                 android:id="@+id/note_100"
                 layout="@layout/view_note_row"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_width="@dimen/match_constraint"
+                android:layout_height="@dimen/match_constraint"
                 android:layout_marginTop="@dimen/note_row_gap"
                 app:layout_constraintBottom_toTopOf="@id/note_50"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -3920,8 +3937,8 @@ class MainActivityTest {
             <include
                 android:id="@+id/note_50"
                 layout="@layout/view_note_row"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_width="@dimen/match_constraint"
+                android:layout_height="@dimen/match_constraint"
                 android:layout_marginTop="@dimen/note_row_gap"
                 app:layout_constraintBottom_toTopOf="@id/note_20"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -3931,8 +3948,8 @@ class MainActivityTest {
             <include
                 android:id="@+id/note_20"
                 layout="@layout/view_note_row"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_width="@dimen/match_constraint"
+                android:layout_height="@dimen/match_constraint"
                 android:layout_marginTop="@dimen/note_row_gap"
                 app:layout_constraintBottom_toTopOf="@id/note_10"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -3942,8 +3959,8 @@ class MainActivityTest {
             <include
                 android:id="@+id/note_10"
                 layout="@layout/view_note_row"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_width="@dimen/match_constraint"
+                android:layout_height="@dimen/match_constraint"
                 android:layout_marginTop="@dimen/note_row_gap"
                 app:layout_constraintBottom_toTopOf="@id/note_5"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -3953,8 +3970,8 @@ class MainActivityTest {
             <include
                 android:id="@+id/note_5"
                 layout="@layout/view_note_row"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_width="@dimen/match_constraint"
+                android:layout_height="@dimen/match_constraint"
                 android:layout_marginTop="@dimen/note_row_gap"
                 app:layout_constraintBottom_toTopOf="@id/note_2"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -3964,8 +3981,8 @@ class MainActivityTest {
             <include
                 android:id="@+id/note_2"
                 layout="@layout/view_note_row"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_width="@dimen/match_constraint"
+                android:layout_height="@dimen/match_constraint"
                 android:layout_marginTop="@dimen/note_row_gap"
                 app:layout_constraintBottom_toTopOf="@id/note_1"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -3975,8 +3992,8 @@ class MainActivityTest {
             <include
                 android:id="@+id/note_1"
                 layout="@layout/view_note_row"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_width="@dimen/match_constraint"
+                android:layout_height="@dimen/match_constraint"
                 android:layout_marginTop="@dimen/note_row_gap"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -3997,8 +4014,8 @@ class MainActivityTest {
     -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/keypad"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="@dimen/match_constraint"
+        android:layout_height="@dimen/match_constraint"
         android:layout_marginStart="@dimen/column_gap"
         android:layout_marginEnd="@dimen/screen_margin"
         app:layout_constraintBottom_toBottomOf="@id/notes_card"
@@ -4009,8 +4026,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_1"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:text="@string/key_1"
             app:layout_constraintBottom_toTopOf="@id/key_4"
             app:layout_constraintEnd_toStartOf="@id/key_2"
@@ -4020,8 +4037,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_2"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:layout_marginStart="@dimen/key_gap"
             android:text="@string/key_2"
             app:layout_constraintBottom_toBottomOf="@id/key_1"
@@ -4032,8 +4049,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_3"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:layout_marginStart="@dimen/key_gap"
             android:text="@string/key_3"
             app:layout_constraintBottom_toBottomOf="@id/key_1"
@@ -4044,8 +4061,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_4"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:layout_marginTop="@dimen/key_gap"
             android:text="@string/key_4"
             app:layout_constraintBottom_toTopOf="@id/key_7"
@@ -4056,8 +4073,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_5"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:layout_marginStart="@dimen/key_gap"
             android:text="@string/key_5"
             app:layout_constraintBottom_toBottomOf="@id/key_4"
@@ -4068,8 +4085,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_6"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:layout_marginStart="@dimen/key_gap"
             android:text="@string/key_6"
             app:layout_constraintBottom_toBottomOf="@id/key_4"
@@ -4080,8 +4097,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_7"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:layout_marginTop="@dimen/key_gap"
             android:text="@string/key_7"
             app:layout_constraintBottom_toTopOf="@id/key_0"
@@ -4092,8 +4109,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_8"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:layout_marginStart="@dimen/key_gap"
             android:text="@string/key_8"
             app:layout_constraintBottom_toBottomOf="@id/key_7"
@@ -4104,8 +4121,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_9"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:layout_marginStart="@dimen/key_gap"
             android:text="@string/key_9"
             app:layout_constraintBottom_toBottomOf="@id/key_7"
@@ -4116,8 +4133,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_0"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:layout_marginTop="@dimen/key_gap"
             android:text="@string/key_0"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -4128,8 +4145,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_clear"
             style="@style/Widget.VangtiChai.Key.Clear"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:contentDescription="@string/cd_key_clear"
             android:text="@string/key_clear"
             app:layout_constraintBottom_toBottomOf="@id/key_0"
@@ -4164,7 +4181,7 @@ class MainActivityTest {
     <!-- Header: app bar and amount. Drawn behind the status bar; MainActivity pads it. -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/header"
-        android:layout_width="0dp"
+        android:layout_width="@dimen/match_constraint"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_header"
         android:paddingBottom="@dimen/header_padding_bottom"
@@ -4175,7 +4192,7 @@ class MainActivityTest {
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             style="@style/Widget.VangtiChai.Toolbar"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/match_constraint"
             android:layout_height="?attr/actionBarSize"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -4199,7 +4216,7 @@ class MainActivityTest {
         <TextView
             android:id="@+id/amount_text"
             style="@style/Widget.VangtiChai.Amount"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/match_constraint"
             android:layout_height="@dimen/amount_height"
             android:layout_marginStart="@dimen/amount_side_margin"
             android:layout_marginEnd="@dimen/amount_side_margin"
@@ -4238,8 +4255,8 @@ class MainActivityTest {
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/notes_card"
         style="@style/Widget.VangtiChai.Card"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="@dimen/match_constraint"
+        android:layout_height="@dimen/match_constraint"
         android:layout_marginStart="@dimen/screen_margin"
         android:layout_marginTop="@dimen/section_gap"
         android:layout_marginBottom="@dimen/screen_margin"
@@ -4256,7 +4273,7 @@ class MainActivityTest {
             <TextView
                 android:id="@+id/notes_title"
                 style="@style/Widget.VangtiChai.NotesTitle"
-                android:layout_width="0dp"
+                android:layout_width="@dimen/match_constraint"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/notes_title_margin_horizontal"
                 android:layout_marginTop="@dimen/notes_title_margin_vertical"
@@ -4278,8 +4295,8 @@ class MainActivityTest {
             <include
                 android:id="@+id/note_500"
                 layout="@layout/view_note_row"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_width="@dimen/match_constraint"
+                android:layout_height="@dimen/match_constraint"
                 android:layout_marginTop="@dimen/notes_title_margin_vertical"
                 android:layout_marginEnd="@dimen/note_column_half_gap"
                 app:layout_constraintBottom_toTopOf="@id/note_100"
@@ -4290,8 +4307,8 @@ class MainActivityTest {
             <include
                 android:id="@+id/note_100"
                 layout="@layout/view_note_row"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_width="@dimen/match_constraint"
+                android:layout_height="@dimen/match_constraint"
                 android:layout_marginTop="@dimen/note_row_gap"
                 android:layout_marginEnd="@dimen/note_column_half_gap"
                 app:layout_constraintBottom_toTopOf="@id/note_50"
@@ -4302,8 +4319,8 @@ class MainActivityTest {
             <include
                 android:id="@+id/note_50"
                 layout="@layout/view_note_row"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_width="@dimen/match_constraint"
+                android:layout_height="@dimen/match_constraint"
                 android:layout_marginTop="@dimen/note_row_gap"
                 android:layout_marginEnd="@dimen/note_column_half_gap"
                 app:layout_constraintBottom_toTopOf="@id/note_20"
@@ -4314,8 +4331,8 @@ class MainActivityTest {
             <include
                 android:id="@+id/note_20"
                 layout="@layout/view_note_row"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_width="@dimen/match_constraint"
+                android:layout_height="@dimen/match_constraint"
                 android:layout_marginTop="@dimen/note_row_gap"
                 android:layout_marginEnd="@dimen/note_column_half_gap"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -4327,8 +4344,8 @@ class MainActivityTest {
             <include
                 android:id="@+id/note_10"
                 layout="@layout/view_note_row"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_width="@dimen/match_constraint"
+                android:layout_height="@dimen/match_constraint"
                 android:layout_marginStart="@dimen/note_column_half_gap"
                 android:layout_marginTop="@dimen/notes_title_margin_vertical"
                 app:layout_constraintBottom_toTopOf="@id/note_5"
@@ -4339,8 +4356,8 @@ class MainActivityTest {
             <include
                 android:id="@+id/note_5"
                 layout="@layout/view_note_row"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_width="@dimen/match_constraint"
+                android:layout_height="@dimen/match_constraint"
                 android:layout_marginStart="@dimen/note_column_half_gap"
                 android:layout_marginTop="@dimen/note_row_gap"
                 app:layout_constraintBottom_toTopOf="@id/note_2"
@@ -4351,8 +4368,8 @@ class MainActivityTest {
             <include
                 android:id="@+id/note_2"
                 layout="@layout/view_note_row"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_width="@dimen/match_constraint"
+                android:layout_height="@dimen/match_constraint"
                 android:layout_marginStart="@dimen/note_column_half_gap"
                 android:layout_marginTop="@dimen/note_row_gap"
                 app:layout_constraintBottom_toTopOf="@id/note_1"
@@ -4363,8 +4380,8 @@ class MainActivityTest {
             <include
                 android:id="@+id/note_1"
                 layout="@layout/view_note_row"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_width="@dimen/match_constraint"
+                android:layout_height="@dimen/match_constraint"
                 android:layout_marginStart="@dimen/note_column_half_gap"
                 android:layout_marginTop="@dimen/note_row_gap"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -4384,8 +4401,8 @@ class MainActivityTest {
     -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/keypad"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="@dimen/match_constraint"
+        android:layout_height="@dimen/match_constraint"
         android:layout_marginStart="@dimen/column_gap"
         android:layout_marginEnd="@dimen/screen_margin"
         app:layout_constraintBottom_toBottomOf="@id/notes_card"
@@ -4396,8 +4413,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_1"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:text="@string/key_1"
             app:layout_constraintBottom_toTopOf="@id/key_5"
             app:layout_constraintEnd_toStartOf="@id/key_2"
@@ -4407,8 +4424,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_2"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:layout_marginStart="@dimen/key_gap"
             android:text="@string/key_2"
             app:layout_constraintBottom_toBottomOf="@id/key_1"
@@ -4419,8 +4436,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_3"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:layout_marginStart="@dimen/key_gap"
             android:text="@string/key_3"
             app:layout_constraintBottom_toBottomOf="@id/key_1"
@@ -4431,8 +4448,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_4"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:layout_marginStart="@dimen/key_gap"
             android:text="@string/key_4"
             app:layout_constraintBottom_toBottomOf="@id/key_1"
@@ -4443,8 +4460,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_5"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:layout_marginTop="@dimen/key_gap"
             android:text="@string/key_5"
             app:layout_constraintBottom_toTopOf="@id/key_9"
@@ -4455,8 +4472,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_6"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:layout_marginStart="@dimen/key_gap"
             android:text="@string/key_6"
             app:layout_constraintBottom_toBottomOf="@id/key_5"
@@ -4467,8 +4484,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_7"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:layout_marginStart="@dimen/key_gap"
             android:text="@string/key_7"
             app:layout_constraintBottom_toBottomOf="@id/key_5"
@@ -4479,8 +4496,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_8"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:layout_marginStart="@dimen/key_gap"
             android:text="@string/key_8"
             app:layout_constraintBottom_toBottomOf="@id/key_5"
@@ -4491,8 +4508,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_9"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:layout_marginTop="@dimen/key_gap"
             android:text="@string/key_9"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -4503,8 +4520,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_0"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:text="@string/key_0"
             app:layout_constraintBottom_toBottomOf="@id/key_9"
             app:layout_constraintEnd_toEndOf="@id/key_6"
@@ -4514,8 +4531,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_clear"
             style="@style/Widget.VangtiChai.Key.Clear"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:contentDescription="@string/cd_key_clear"
             android:text="@string/key_clear"
             app:layout_constraintBottom_toBottomOf="@id/key_9"
@@ -4554,8 +4571,8 @@ class MainActivityTest {
     -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/header"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="@dimen/match_constraint"
+        android:layout_height="@dimen/match_constraint"
         android:background="@drawable/bg_header"
         android:paddingBottom="@dimen/header_padding_bottom"
         app:layout_constraintEnd_toEndOf="parent"
@@ -4568,7 +4585,7 @@ class MainActivityTest {
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             style="@style/Widget.VangtiChai.Toolbar"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/match_constraint"
             android:layout_height="@dimen/toolbar_height"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -4579,7 +4596,7 @@ class MainActivityTest {
         <TextView
             android:id="@+id/amount_text"
             style="@style/Widget.VangtiChai.Amount"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/match_constraint"
             android:layout_height="@dimen/amount_height"
             android:layout_marginStart="@dimen/amount_side_margin"
             android:layout_marginEnd="@dimen/amount_side_margin"
@@ -4609,7 +4626,7 @@ class MainActivityTest {
         <TextView
             android:id="@+id/caption_text"
             style="@style/Widget.VangtiChai.Caption"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/match_constraint"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/header_padding_horizontal"
             android:layout_marginTop="@dimen/caption_margin_top"
@@ -4636,8 +4653,8 @@ class MainActivityTest {
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/notes_card"
         style="@style/Widget.VangtiChai.Card"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="@dimen/match_constraint"
+        android:layout_height="@dimen/match_constraint"
         android:layout_marginStart="@dimen/screen_margin"
         android:layout_marginTop="@dimen/section_gap"
         android:layout_marginBottom="@dimen/screen_margin"
@@ -4656,7 +4673,7 @@ class MainActivityTest {
             <TextView
                 android:id="@+id/notes_title"
                 style="@style/Widget.VangtiChai.NotesTitle"
-                android:layout_width="0dp"
+                android:layout_width="@dimen/match_constraint"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/notes_title_margin_horizontal"
                 android:layout_marginTop="@dimen/notes_title_margin_vertical"
@@ -4681,8 +4698,8 @@ class MainActivityTest {
             <include
                 android:id="@+id/note_500"
                 layout="@layout/view_note_row"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_width="@dimen/match_constraint"
+                android:layout_height="@dimen/match_constraint"
                 android:layout_marginTop="@dimen/notes_title_margin_vertical"
                 app:layout_constraintBottom_toTopOf="@id/note_100"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -4692,8 +4709,8 @@ class MainActivityTest {
             <include
                 android:id="@+id/note_100"
                 layout="@layout/view_note_row"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_width="@dimen/match_constraint"
+                android:layout_height="@dimen/match_constraint"
                 android:layout_marginTop="@dimen/note_row_gap"
                 app:layout_constraintBottom_toTopOf="@id/note_50"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -4703,8 +4720,8 @@ class MainActivityTest {
             <include
                 android:id="@+id/note_50"
                 layout="@layout/view_note_row"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_width="@dimen/match_constraint"
+                android:layout_height="@dimen/match_constraint"
                 android:layout_marginTop="@dimen/note_row_gap"
                 app:layout_constraintBottom_toTopOf="@id/note_20"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -4714,8 +4731,8 @@ class MainActivityTest {
             <include
                 android:id="@+id/note_20"
                 layout="@layout/view_note_row"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_width="@dimen/match_constraint"
+                android:layout_height="@dimen/match_constraint"
                 android:layout_marginTop="@dimen/note_row_gap"
                 app:layout_constraintBottom_toTopOf="@id/note_10"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -4725,8 +4742,8 @@ class MainActivityTest {
             <include
                 android:id="@+id/note_10"
                 layout="@layout/view_note_row"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_width="@dimen/match_constraint"
+                android:layout_height="@dimen/match_constraint"
                 android:layout_marginTop="@dimen/note_row_gap"
                 app:layout_constraintBottom_toTopOf="@id/note_5"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -4736,8 +4753,8 @@ class MainActivityTest {
             <include
                 android:id="@+id/note_5"
                 layout="@layout/view_note_row"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_width="@dimen/match_constraint"
+                android:layout_height="@dimen/match_constraint"
                 android:layout_marginTop="@dimen/note_row_gap"
                 app:layout_constraintBottom_toTopOf="@id/note_2"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -4747,8 +4764,8 @@ class MainActivityTest {
             <include
                 android:id="@+id/note_2"
                 layout="@layout/view_note_row"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_width="@dimen/match_constraint"
+                android:layout_height="@dimen/match_constraint"
                 android:layout_marginTop="@dimen/note_row_gap"
                 app:layout_constraintBottom_toTopOf="@id/note_1"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -4758,8 +4775,8 @@ class MainActivityTest {
             <include
                 android:id="@+id/note_1"
                 layout="@layout/view_note_row"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_width="@dimen/match_constraint"
+                android:layout_height="@dimen/match_constraint"
                 android:layout_marginTop="@dimen/note_row_gap"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -4780,8 +4797,8 @@ class MainActivityTest {
     -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/keypad"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="@dimen/match_constraint"
+        android:layout_height="@dimen/match_constraint"
         android:layout_marginStart="@dimen/column_gap"
         android:layout_marginEnd="@dimen/screen_margin"
         app:layout_constraintBottom_toBottomOf="@id/notes_card"
@@ -4792,8 +4809,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_1"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:text="@string/key_1"
             app:layout_constraintBottom_toTopOf="@id/key_4"
             app:layout_constraintEnd_toStartOf="@id/key_2"
@@ -4803,8 +4820,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_2"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:layout_marginStart="@dimen/key_gap"
             android:text="@string/key_2"
             app:layout_constraintBottom_toBottomOf="@id/key_1"
@@ -4815,8 +4832,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_3"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:layout_marginStart="@dimen/key_gap"
             android:text="@string/key_3"
             app:layout_constraintBottom_toBottomOf="@id/key_1"
@@ -4827,8 +4844,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_4"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:layout_marginTop="@dimen/key_gap"
             android:text="@string/key_4"
             app:layout_constraintBottom_toTopOf="@id/key_7"
@@ -4839,8 +4856,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_5"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:layout_marginStart="@dimen/key_gap"
             android:text="@string/key_5"
             app:layout_constraintBottom_toBottomOf="@id/key_4"
@@ -4851,8 +4868,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_6"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:layout_marginStart="@dimen/key_gap"
             android:text="@string/key_6"
             app:layout_constraintBottom_toBottomOf="@id/key_4"
@@ -4863,8 +4880,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_7"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:layout_marginTop="@dimen/key_gap"
             android:text="@string/key_7"
             app:layout_constraintBottom_toTopOf="@id/key_0"
@@ -4875,8 +4892,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_8"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:layout_marginStart="@dimen/key_gap"
             android:text="@string/key_8"
             app:layout_constraintBottom_toBottomOf="@id/key_7"
@@ -4887,8 +4904,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_9"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:layout_marginStart="@dimen/key_gap"
             android:text="@string/key_9"
             app:layout_constraintBottom_toBottomOf="@id/key_7"
@@ -4899,8 +4916,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_0"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:layout_marginTop="@dimen/key_gap"
             android:text="@string/key_0"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -4911,8 +4928,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_clear"
             style="@style/Widget.VangtiChai.Key.Clear"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:contentDescription="@string/cd_key_clear"
             android:text="@string/key_clear"
             app:layout_constraintBottom_toBottomOf="@id/key_0"
@@ -4948,7 +4965,7 @@ class MainActivityTest {
     <!-- Header: app bar and amount. Drawn behind the status bar; MainActivity pads it. -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/header"
-        android:layout_width="0dp"
+        android:layout_width="@dimen/match_constraint"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_header"
         android:paddingBottom="@dimen/header_padding_bottom"
@@ -4959,7 +4976,7 @@ class MainActivityTest {
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             style="@style/Widget.VangtiChai.Toolbar"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/match_constraint"
             android:layout_height="@dimen/toolbar_height"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -4970,7 +4987,7 @@ class MainActivityTest {
         <TextView
             android:id="@+id/amount_text"
             style="@style/Widget.VangtiChai.Amount"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/match_constraint"
             android:layout_height="@dimen/amount_height"
             android:layout_marginStart="@dimen/amount_side_margin"
             android:layout_marginEnd="@dimen/amount_side_margin"
@@ -4998,7 +5015,7 @@ class MainActivityTest {
         <TextView
             android:id="@+id/caption_text"
             style="@style/Widget.VangtiChai.Caption"
-            android:layout_width="0dp"
+            android:layout_width="@dimen/match_constraint"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/header_padding_horizontal"
             android:layout_marginTop="@dimen/caption_margin_top"
@@ -5023,8 +5040,8 @@ class MainActivityTest {
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/notes_card"
         style="@style/Widget.VangtiChai.Card"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="@dimen/match_constraint"
+        android:layout_height="@dimen/match_constraint"
         android:layout_marginStart="@dimen/screen_margin"
         android:layout_marginTop="@dimen/section_gap"
         android:layout_marginBottom="@dimen/screen_margin"
@@ -5041,7 +5058,7 @@ class MainActivityTest {
             <TextView
                 android:id="@+id/notes_title"
                 style="@style/Widget.VangtiChai.NotesTitle"
-                android:layout_width="0dp"
+                android:layout_width="@dimen/match_constraint"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/notes_title_margin_horizontal"
                 android:layout_marginTop="@dimen/notes_title_margin_vertical"
@@ -5063,8 +5080,8 @@ class MainActivityTest {
             <include
                 android:id="@+id/note_500"
                 layout="@layout/view_note_row"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_width="@dimen/match_constraint"
+                android:layout_height="@dimen/match_constraint"
                 android:layout_marginTop="@dimen/notes_title_margin_vertical"
                 android:layout_marginEnd="@dimen/note_column_half_gap"
                 app:layout_constraintBottom_toTopOf="@id/note_100"
@@ -5075,8 +5092,8 @@ class MainActivityTest {
             <include
                 android:id="@+id/note_100"
                 layout="@layout/view_note_row"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_width="@dimen/match_constraint"
+                android:layout_height="@dimen/match_constraint"
                 android:layout_marginTop="@dimen/note_row_gap"
                 android:layout_marginEnd="@dimen/note_column_half_gap"
                 app:layout_constraintBottom_toTopOf="@id/note_50"
@@ -5087,8 +5104,8 @@ class MainActivityTest {
             <include
                 android:id="@+id/note_50"
                 layout="@layout/view_note_row"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_width="@dimen/match_constraint"
+                android:layout_height="@dimen/match_constraint"
                 android:layout_marginTop="@dimen/note_row_gap"
                 android:layout_marginEnd="@dimen/note_column_half_gap"
                 app:layout_constraintBottom_toTopOf="@id/note_20"
@@ -5099,8 +5116,8 @@ class MainActivityTest {
             <include
                 android:id="@+id/note_20"
                 layout="@layout/view_note_row"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_width="@dimen/match_constraint"
+                android:layout_height="@dimen/match_constraint"
                 android:layout_marginTop="@dimen/note_row_gap"
                 android:layout_marginEnd="@dimen/note_column_half_gap"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -5112,8 +5129,8 @@ class MainActivityTest {
             <include
                 android:id="@+id/note_10"
                 layout="@layout/view_note_row"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_width="@dimen/match_constraint"
+                android:layout_height="@dimen/match_constraint"
                 android:layout_marginStart="@dimen/note_column_half_gap"
                 android:layout_marginTop="@dimen/notes_title_margin_vertical"
                 app:layout_constraintBottom_toTopOf="@id/note_5"
@@ -5124,8 +5141,8 @@ class MainActivityTest {
             <include
                 android:id="@+id/note_5"
                 layout="@layout/view_note_row"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_width="@dimen/match_constraint"
+                android:layout_height="@dimen/match_constraint"
                 android:layout_marginStart="@dimen/note_column_half_gap"
                 android:layout_marginTop="@dimen/note_row_gap"
                 app:layout_constraintBottom_toTopOf="@id/note_2"
@@ -5136,8 +5153,8 @@ class MainActivityTest {
             <include
                 android:id="@+id/note_2"
                 layout="@layout/view_note_row"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_width="@dimen/match_constraint"
+                android:layout_height="@dimen/match_constraint"
                 android:layout_marginStart="@dimen/note_column_half_gap"
                 android:layout_marginTop="@dimen/note_row_gap"
                 app:layout_constraintBottom_toTopOf="@id/note_1"
@@ -5148,8 +5165,8 @@ class MainActivityTest {
             <include
                 android:id="@+id/note_1"
                 layout="@layout/view_note_row"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_width="@dimen/match_constraint"
+                android:layout_height="@dimen/match_constraint"
                 android:layout_marginStart="@dimen/note_column_half_gap"
                 android:layout_marginTop="@dimen/note_row_gap"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -5169,8 +5186,8 @@ class MainActivityTest {
     -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/keypad"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="@dimen/match_constraint"
+        android:layout_height="@dimen/match_constraint"
         android:layout_marginStart="@dimen/column_gap"
         android:layout_marginEnd="@dimen/screen_margin"
         app:layout_constraintBottom_toBottomOf="@id/notes_card"
@@ -5181,8 +5198,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_1"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:text="@string/key_1"
             app:layout_constraintBottom_toTopOf="@id/key_5"
             app:layout_constraintEnd_toStartOf="@id/key_2"
@@ -5192,8 +5209,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_2"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:layout_marginStart="@dimen/key_gap"
             android:text="@string/key_2"
             app:layout_constraintBottom_toBottomOf="@id/key_1"
@@ -5204,8 +5221,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_3"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:layout_marginStart="@dimen/key_gap"
             android:text="@string/key_3"
             app:layout_constraintBottom_toBottomOf="@id/key_1"
@@ -5216,8 +5233,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_4"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:layout_marginStart="@dimen/key_gap"
             android:text="@string/key_4"
             app:layout_constraintBottom_toBottomOf="@id/key_1"
@@ -5228,8 +5245,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_5"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:layout_marginTop="@dimen/key_gap"
             android:text="@string/key_5"
             app:layout_constraintBottom_toTopOf="@id/key_9"
@@ -5240,8 +5257,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_6"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:layout_marginStart="@dimen/key_gap"
             android:text="@string/key_6"
             app:layout_constraintBottom_toBottomOf="@id/key_5"
@@ -5252,8 +5269,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_7"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:layout_marginStart="@dimen/key_gap"
             android:text="@string/key_7"
             app:layout_constraintBottom_toBottomOf="@id/key_5"
@@ -5264,8 +5281,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_8"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:layout_marginStart="@dimen/key_gap"
             android:text="@string/key_8"
             app:layout_constraintBottom_toBottomOf="@id/key_5"
@@ -5276,8 +5293,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_9"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:layout_marginTop="@dimen/key_gap"
             android:text="@string/key_9"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -5288,8 +5305,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_0"
             style="@style/Widget.VangtiChai.Key"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:text="@string/key_0"
             app:layout_constraintBottom_toBottomOf="@id/key_9"
             app:layout_constraintEnd_toEndOf="@id/key_6"
@@ -5299,8 +5316,8 @@ class MainActivityTest {
         <com.google.android.material.button.MaterialButton
             android:id="@+id/key_clear"
             style="@style/Widget.VangtiChai.Key.Clear"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/match_constraint"
+            android:layout_height="@dimen/match_constraint"
             android:contentDescription="@string/cd_key_clear"
             android:text="@string/key_clear"
             app:layout_constraintBottom_toBottomOf="@id/key_9"
@@ -5680,6 +5697,9 @@ layout proportions are defined in sizes.xml for each configuration:
   res/values-land/sizes.xml          phones, landscape
   res/values-sw600dp/sizes.xml       tablets, portrait
   res/values-sw600dp-land/sizes.xml  tablets, landscape
+
+Even ConstraintLayout's "match constraints" size, 0dp, is not written in the layouts: they use
+@dimen/match_constraint, defined once in res/values/sizes.xml.
 
 All text is in res/values/strings.xml and all colours in res/values/colors.xml.
 

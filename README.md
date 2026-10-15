@@ -111,7 +111,7 @@ All four layouts are built on `ConstraintLayout` using chains, guidelines and pe
 | `layout-sw600dp/activity_main.xml` | Tablet, portrait | Nexus 10 · 800 × 1280 dp |
 | `layout-sw600dp-land/activity_main.xml` | Tablet, landscape | Nexus 10 · 1280 × 800 dp |
 
-The layout files contain no hardcoded values. Text sizes, margins, paddings, corner radii and proportions come from a `sizes.xml` for each configuration, all text is in `strings.xml`, and all colours are in `colors.xml`.
+The layout files contain no hardcoded values. Text sizes, margins, paddings, corner radii and proportions come from a `sizes.xml` for each configuration, all text is in `strings.xml`, and all colours are in `colors.xml`. Even ConstraintLayout's "match constraints" size, `0dp`, is written as `@dimen/match_constraint`.
 
 ### Tested screen sizes
 

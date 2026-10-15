@@ -16,7 +16,7 @@
     <View
         android:id="@+id/note_accent"
         android:layout_width="@dimen/note_accent_width"
-        android:layout_height="0dp"
+        android:layout_height="@dimen/match_constraint"
         android:background="@drawable/bg_note_accent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHeight_percent="@dimen/note_accent_height_percent"
@@ -38,8 +38,8 @@
     <TextView
         android:id="@+id/note_count"
         style="@style/Widget.VangtiChai.NoteCount"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="@dimen/match_constraint"
+        android:layout_height="@dimen/match_constraint"
         android:layout_marginStart="@dimen/note_count_margin_start"
         android:importantForAccessibility="no"
         app:layout_constraintBottom_toBottomOf="parent"
